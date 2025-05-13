@@ -1,19 +1,25 @@
 
 import { Box, Typography, List, Drawer, ListItem, ListItemText } from '@mui/material'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import { useNavigate } from 'react-router-dom';
 
 const drawerWidth = 400;
 const menuItems = [
-  { id: 1, text: "Inicio" },
-  { id: 2, text: "Rings" },
-  { id: 3, text: "Necklaces" },
-  { id: 4, text: "Earrings" },
-  { id: 5, text: "Watches" },
-  { id: 6, text: "Bracelets" },
-  { id: 7, text: "New Arrivals" }
+  { id: 1, text: "Inicio", path: "/" },
+  { id: 2, text: "Rings", path: "/rings" },
+  { id: 3, text: "Necklaces", path: "/necklaces" },
+  { id: 4, text: "Earrings", path: "/earrings" },
+  { id: 5, text: "Watches", path: "/watches" },
+  { id: 6, text: "Bracelets", path: "/bracelets" },
+  { id: 7, text: "New Arrivals", path: "/new-arrivals" }
 ];
 
 function DrawerSide({ onMenuClick, isDrawerOpen }) {
+  const navigate = useNavigate();
+  const handleNavigation = (path) => {
+    navigate(path);
+    onMenuClick();
+  };
   return (
     <Drawer
       variant="temporary"
@@ -53,10 +59,12 @@ function DrawerSide({ onMenuClick, isDrawerOpen }) {
       <Box sx={{ p: 2 }}>
         <List>
           {menuItems.map((item) => (
-            <ListItem button key={item.id}>
-              <ListItemText
-                primary={item.text}
-              />
+            <ListItem 
+              button 
+              key={item.id}
+              onClick={() => handleNavigation(item.path)}
+            >
+              <ListItemText primary={item.text} />
             </ListItem>
           ))}
         </List>

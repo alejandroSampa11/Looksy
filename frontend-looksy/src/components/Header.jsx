@@ -18,7 +18,7 @@ function Header({ onMenuClick }) {
                     </Typography>
                 </Box>
 
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '40%' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', width: '40%' }}>
                     <TextField
                         size="small"
                         fullWidth

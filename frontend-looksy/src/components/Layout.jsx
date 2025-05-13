@@ -24,7 +24,7 @@ function Layout({ children }) {
         }}
       >
         <Toolbar />
-        <Box sx={{ backgroundColor: '#F0F1EB', width: '100%', p: 3, height: '100%', flexGrow: 1 }}>
+        <Box sx={{ backgroundColor: '#F0F1EB', width: '100%', height: '100%', flexGrow: 1, pb: 5 }}>
           {children}
         </Box>
       </Box>

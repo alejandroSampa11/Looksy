@@ -1,6 +1,7 @@
 import { Box, Typography } from '@mui/material'
+import React from 'react'
 
-function RingsView() {
+function NewArrivalsView() {
   return (
     <>
       <Box
@@ -13,7 +14,7 @@ function RingsView() {
           display: 'block',
           marginTop: 6
         }}
-        src="../public/bannerRing.jpeg"
+        src="../public/bannerNew.webp"
         alt="Banner"
       />
       <Box sx={{
@@ -34,4 +35,4 @@ function RingsView() {
   )
 }
 
-export default RingsView
+export default NewArrivalsView

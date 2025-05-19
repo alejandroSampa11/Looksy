@@ -24,9 +24,9 @@ function CardItem({ imagen, nombre, precio }) {
                 <Box
                     component="img"
                     sx={{
-                        width: '250px',  // Reduced from auto
-                        height: '250px', // Reduced from 350px
-                        objectFit: 'contain', // Added to maintain aspect ratio
+                        width: '250px',
+                        height: '250px',
+                        objectFit: 'contain',
                         padding: 2,
                     }}
                     src={`${imagen}`}

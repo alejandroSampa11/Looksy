@@ -1,14 +1,14 @@
-import { Box, Toolbar, Container } from '@mui/material'
+import { Box, Toolbar } from '@mui/material';
 import Header from './Header';
 import { useState } from 'react';
 import DrawerSide from './DrawerSide';
+import { Outlet } from 'react-router-dom';
 
-function Layout({ children }) {
-
+function Layout() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const handleDrawerToogle = () => {
     setIsDrawerOpen(!isDrawerOpen);
-  }
+  };
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -25,11 +25,11 @@ function Layout({ children }) {
       >
         <Toolbar />
         <Box sx={{ backgroundColor: '#F0F1EB', width: '100%', height: '100%', flexGrow: 1, pb: 5 }}>
-          {children}
+          <Outlet />
         </Box>
       </Box>
     </Box>
-  )
+  );
 }
 
-export default Layout
+export default Layout;

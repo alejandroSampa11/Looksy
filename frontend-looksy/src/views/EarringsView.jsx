@@ -1,0 +1,37 @@
+import { Box, Typography } from '@mui/material'
+
+function EarringsView() {
+   return (
+        <>
+            <Box
+                component="img"
+                sx={{
+                    width: '100%',
+                    height: 'auto',
+                    maxHeight: '500px',
+                    objectFit: 'cover',
+                    display: 'block',
+                    marginTop: 6
+                }}
+                src="../public/bannerEarrings.webp"
+                alt="Banner"
+            />
+            <Box sx={{
+                width: '100%',
+                height: 'auto',
+                objectFit: 'cover',
+                display: 'block',
+                marginTop: 6
+            }}>
+                <Typography sx={{ color: '#000000', textAlign: 'center' }} variant="h3">
+                    Rings
+                </Typography>
+                <Typography sx={{ color: '#000000', textAlign: 'center', marginTop: 1 }} variant="h5">
+                    Discover our exquisite collection of rings—timeless elegance for every occasion.
+                </Typography>
+            </Box>
+        </>
+    )
+}
+
+export default EarringsView

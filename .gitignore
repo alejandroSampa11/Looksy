@@ -1,1 +1,34 @@
-keys/
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Entorno
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+*.csv
+*.out
+*.pid
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editor config
+.vscode/
+.idea/
+
+# Testing
+coverage/
+
+# Build
+dist/
+build/
+
+.DS_Store/

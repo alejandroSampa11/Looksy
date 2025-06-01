@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -46,6 +46,7 @@ import StarIcon from '@mui/icons-material/Star';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import DiamondIcon from '@mui/icons-material/Diamond';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import apiAxios from '../config/cienteAxios';
 
 const sampleProducts = [
   { id: 1, name: 'Gold Ring', category: 'rings', price: 299.99, stock: 15, description: 'Elegant 18K gold ring with intricate design', imageUrl: '/api/placeholder/150/150', rating: 4.8, sales: 42 },
@@ -63,9 +64,19 @@ const categoryOptions = [
 ];
 
 function AdminView() {
+
+  //#region STATES
   const [tabValue, setTabValue] = useState(0);
   const [products, setProducts] = useState(sampleProducts);
   const [selectedProduct, setSelectedProduct] = useState(null);
+
+  //#region EFFECTS
+  useEffect(() => {
+    if (tabValue === 2) {
+      // OBTENER TODOS LOS ITEMS
+    }
+  }, [tabValue]);
+
 
   const [formData, setFormData] = useState({
     name: '',
@@ -101,19 +112,43 @@ function AdminView() {
     });
   };
 
-  const handleCreateProduct = (e) => {
-    e.preventDefault();
-    const newProduct = {
-      id: Math.max(...products.map(p => p.id)) + 1,
-      ...formData,
-      price: parseFloat(formData.price),
-      stock: parseInt(formData.stock),
-      rating: 0,
-      sales: 0
+  const getCategoryNumber = (categoryName) => {
+    const categoryMap = {
+      'rings': 1,
+      'necklaces': 2,
+      'earrings': 3,
+      'bracelets': 4,
+      'watches': 5
     };
-    setProducts([...products, newProduct]);
-    resetForm();
-    alert('Product created successfully!');
+    return categoryMap[categoryName] || 1;
+  };
+
+  const handleCreateProduct = async (e) => {
+    e.preventDefault();
+
+    try {
+      const itemData = {
+        nombre: formData.name,
+        categoria: getCategoryNumber(formData.category),
+        precio: parseFloat(formData.price),
+        stock: parseInt(formData.stock),
+        descripcion: formData.description,
+        urlImage: formData.imageUrl
+      };
+
+      const response = await apiAxios.post('/item', itemData);
+      const result = response.data;
+
+      if (response.status !== 201) {
+        throw new Error(result.message || 'Error al crear el producto');
+      }
+
+      resetForm();
+      alert('Producto creado exitosamente!');
+    } catch (error) {
+      console.error('Error al crear producto:', error);
+      alert(`Error al crear el producto: ${error.message}`);
+    }
   };
 
   const handleDeleteProduct = (productId) => {

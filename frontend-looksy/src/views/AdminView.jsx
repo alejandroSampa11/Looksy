@@ -47,13 +47,9 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import DiamondIcon from '@mui/icons-material/Diamond';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import apiAxios from '../config/cienteAxios';
+import { toast } from 'react-toastify';
+import Swal from 'sweetalert2'
 
-const sampleProducts = [
-  { id: 1, name: 'Gold Ring', category: 'rings', price: 299.99, stock: 15, description: 'Elegant 18K gold ring with intricate design', imageUrl: '/api/placeholder/150/150', rating: 4.8, sales: 42 },
-  { id: 2, name: 'Silver Necklace', category: 'necklaces', price: 149.99, stock: 8, description: '925 sterling silver necklace with pendant', imageUrl: '/api/placeholder/150/150', rating: 4.5, sales: 28 },
-  { id: 3, name: 'Diamond Earrings', category: 'earrings', price: 499.99, stock: 5, description: '0.5 carat diamond stud earrings', imageUrl: '/api/placeholder/150/150', rating: 4.9, sales: 35 },
-  { id: 4, name: 'Pearl Bracelet', category: 'bracelets', price: 199.99, stock: 12, description: 'Freshwater pearl bracelet with silver clasp', imageUrl: '/api/placeholder/150/150', rating: 4.3, sales: 19 },
-];
 
 const categoryOptions = [
   { value: 'rings', label: 'Rings' },
@@ -67,25 +63,50 @@ function AdminView() {
 
   //#region STATES
   const [tabValue, setTabValue] = useState(0);
-  const [products, setProducts] = useState(sampleProducts);
+  const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [formData, setFormData] = useState({ name: '', category: 'rings', price: '', stock: '', description: '', imageUrl: '' });
 
   //#region EFFECTS
   useEffect(() => {
-    if (tabValue === 2) {
-      // OBTENER TODOS LOS ITEMS
+    if (tabValue === 2 || tabValue === 1) {
+      fetchProducts();
     }
   }, [tabValue]);
 
+  const fetchProducts = async () => {
+    try {
+      const response = await apiAxios.get('/item');
+      console.log(response);
+      if (response.status === 200) {
+        const transformedProducts = response.data.data.map(item => ({
+          id: item._id,
+          name: item.nombre,
+          category: getCategoryName(item.categoria),
+          price: item.precio,
+          stock: item.stock,
+          description: item.descripcion || '',
+          imageUrl: item.urlImage || '',
+          sales: item.sales || 0,
+          rating: item.rating || 4.5
+        }));
+        setProducts(transformedProducts);
+      }
+    } catch (e) {
+      console.error('Error al obtener productos:', e);
+    }
+  }
 
-  const [formData, setFormData] = useState({
-    name: '',
-    category: 'rings',
-    price: '',
-    stock: '',
-    description: '',
-    imageUrl: ''
-  });
+  const getCategoryName = (categoryNumber) => {
+    const categoryMap = {
+      1: 'rings',
+      2: 'necklaces',
+      3: 'earrings',
+      4: 'bracelets',
+      5: 'watches'
+    };
+    return categoryMap[categoryNumber] || 'rings';
+  };
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -144,20 +165,35 @@ function AdminView() {
       }
 
       resetForm();
-      alert('Producto creado exitosamente!');
+      toast.success('Producto creado exitosamente!');
     } catch (error) {
       console.error('Error al crear producto:', error);
-      alert(`Error al crear el producto: ${error.message}`);
+      toast.error(`Error al crear el producto: ${error.message}`);
     }
   };
 
-  const handleDeleteProduct = (productId) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      setProducts(products.filter(product => product.id !== productId));
-    }
+  const handleDeleteProduct = async (productId) => {
+    console.log(productId);
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await apiAxios.delete('/item', { data: { id: productId } });
+        toast.success('Producto eliminado exitosamente!');
+        fetchProducts();
+      }
+    });
+
   };
 
   const handleSelectProductToEdit = (product) => {
+    console.log(product);
     setSelectedProduct(product);
     setFormData({
       name: product.name,
@@ -169,25 +205,32 @@ function AdminView() {
     });
   };
 
-  const handleUpdateProduct = (e) => {
+  const handleUpdateProduct = async (e) => {
     e.preventDefault();
+    try {
+      const itemData = {
+        id: selectedProduct.id,
+        nombre: formData.name,
+        categoria: getCategoryNumber(formData.category),
+        precio: parseFloat(formData.price),
+        stock: parseInt(formData.stock),
+        descripcion: formData.description,
+        urlImage: formData.imageUrl
+      };
 
-    const updatedProducts = products.map(product => {
-      if (product.id === selectedProduct.id) {
-        return {
-          ...product,
-          ...formData,
-          price: parseFloat(formData.price),
-          stock: parseInt(formData.stock)
-        };
+      const response = await apiAxios.put('/item', itemData);
+      if (response.status === 200) {
+        fetchProducts();
+        setSelectedProduct(null);
+        resetForm();
+        toast.success('Producto actualizado exitosamente!');
+      } else {
+        throw new Error(response.data.message || 'Error updating product');
       }
-      return product;
-    });
-
-    setProducts(updatedProducts);
-    setSelectedProduct(null);
-    resetForm();
-    alert('Product updated successfully!');
+    } catch (error) {
+      console.error('Error updating product:', error);
+      toast.error(`Error updating product: ${error.message}`);
+    }
   };
 
   const totalProducts = products.length;
@@ -196,12 +239,13 @@ function AdminView() {
   const totalSales = products.reduce((sum, product) => sum + product.sales, 0);
 
   const categories = [...new Set(products.map(product => product.category))];
-  const bestSellingProduct = products.reduce((prev, current) =>
-    (prev.sales > current.sales) ? prev : current
-  );
-  const highestRatedProduct = products.reduce((prev, current) =>
-    (prev.rating > current.rating) ? prev : current
-  );
+  const bestSellingProduct = products.length > 0
+    ? products.reduce((prev, current) => (prev.sales > current.sales) ? prev : current)
+    : { name: 'No products', imageUrl: '', sales: 0 };
+
+  const highestRatedProduct = products.length > 0
+    ? products.reduce((prev, current) => (prev.rating > current.rating) ? prev : current)
+    : { name: 'No products', imageUrl: '', rating: 0 };
 
   const getStockColor = (stock) => {
     if (stock < 5) return 'error';

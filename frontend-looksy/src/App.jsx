@@ -15,10 +15,12 @@ import SignUpView from './views/SignUpView';
 import NotFoundView from './views/NotFoundView';
 import LayoutAdmin from './components/LayoutAdmin';
 import AdminView from './views/AdminView';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   return (
     <AuthProvider>
+      <ToastContainer position="bottom-right" />
       <Router>
         <Routes>
           {/* Rutas públicas */}

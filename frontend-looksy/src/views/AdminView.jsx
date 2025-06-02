@@ -43,7 +43,6 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import StarIcon from '@mui/icons-material/Star';
-import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import DiamondIcon from '@mui/icons-material/Diamond';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import apiAxios from '../config/cienteAxios';

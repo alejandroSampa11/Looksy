@@ -25,8 +25,7 @@ import {
     ExitToApp as LogoutIcon
 } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-
+import { useAuth } from '../hooks/useAuth'
 const drawerWidth = 320
 
 const menuItems = [
@@ -41,17 +40,13 @@ const menuItems = [
 
 function DrawerSide({ onMenuClick, isDrawerOpen }) {
     const navigate = useNavigate()
-    const { isAuthenticated, user, logout } = useAuth()
+    const {user, isAuthenticated, hasRole} = useAuth();
 
     const handleNavigation = (path) => {
         navigate(path)
         onMenuClick()
     }
 
-    const handleLogout = () => {
-        logout()
-        onMenuClick()
-    }
 
     return (
         <Drawer
@@ -133,7 +128,7 @@ function DrawerSide({ onMenuClick, isDrawerOpen }) {
                                 color: '#673430'
                             }}
                         >
-                            {user.name || 'User'}
+                            {user.username || 'User'}
                         </Typography>
                     </Box>
                     <Typography
@@ -218,7 +213,7 @@ function DrawerSide({ onMenuClick, isDrawerOpen }) {
                     ))}
                 </List>
 
-                {isAuthenticated && (
+                {hasRole('admin') && (
                     <>
                         <Divider sx={{ my: 2, mx: 2 }} />
                         <Typography

@@ -55,7 +55,6 @@ const userSchema = new Schema<IUser>({
     },
     rol: {
         type: String,
-        required: true,
         trim: true
     }
 }, {

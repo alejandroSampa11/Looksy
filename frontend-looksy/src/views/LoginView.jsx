@@ -2,9 +2,32 @@ import { Box, Button, InputAdornment, TextField, Typography } from "@mui/materia
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import { useNavigate } from "react-router-dom";
+import apiAxios from "../config/cienteAxios";
+import { useState } from "react";
+import { toast } from "react-toastify";
 
 function LoginView() {
     const navigate = useNavigate();
+    const [login, setLogin] = useState({ username: '', password: '' });
+
+const handleLogin = async() => {
+    try {
+        const response = await apiAxios.post('/users/login', login);
+        console.log(response.data);
+        toast.success('¡Bienvenido!');
+        if (response.data.token) {
+            localStorage.setItem('token', response.data.token);
+        }
+        
+        if (response.data.data) {
+            localStorage.setItem('user', JSON.stringify(response.data.data));
+        }
+
+        navigate('/');
+    } catch (error) {
+        console.error('Login error:', error);
+    }
+};
 
     return (
         <Box sx={{
@@ -31,6 +54,8 @@ function LoginView() {
                     fullWidth
                     label="Username"
                     variant="outlined"
+                    value={login.username}
+                    onChange={(e) => setLogin({ ...login, username: e.target.value })}
                     margin="normal"
                     InputProps={{
                         startAdornment: (
@@ -46,6 +71,8 @@ function LoginView() {
                     fullWidth
                     label="Password"
                     type="password"
+                    value={login.password}
+                    onChange={(e) => setLogin({ ...login, password: e.target.value })}
                     variant="outlined"
                     margin="normal"
                     InputProps={{
@@ -57,6 +84,7 @@ function LoginView() {
                     }}
                 />
                 <Button
+                    onClick={handleLogin}
                     variant="contained"
                     sx={{
                         width: '100%',
@@ -64,7 +92,7 @@ function LoginView() {
                         '&:hover': {
                             backgroundColor: '#4a2521'
                         },
-                        mt: 2  
+                        mt: 2
                     }}
                 >
                     Acceder
@@ -74,7 +102,7 @@ function LoginView() {
                         width: '100%',
                         display: 'flex',
                         justifyContent: 'space-between',
-                        mt: 2  
+                        mt: 2
                     }}
                 >
                     <Button

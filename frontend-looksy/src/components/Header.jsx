@@ -32,13 +32,16 @@ import {
     FavoriteBorder as FavoriteIcon,
     Close as CloseIcon
 } from '@mui/icons-material'
-import { useAuth } from '../context/AuthContext'
+import { toast } from 'react-toastify'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
 
 function Header({ onMenuClick, cartItemCount = 0 }) {
-    const { user, logout } = useAuth()
     const theme = useTheme()
     const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-    
+    const { user, isAuthenticated } = useAuth();
+    const navigate = useNavigate();
+
     const [profileMenuAnchor, setProfileMenuAnchor] = useState(null)
     const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
     const [searchValue, setSearchValue] = useState('')
@@ -52,8 +55,11 @@ function Header({ onMenuClick, cartItemCount = 0 }) {
     }
 
     const handleLogout = () => {
-        logout()
-        handleProfileMenuClose()
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        toast.success('Sesión cerrada correctamente');
+        navigate('/');
+        handleProfileMenuClose();
     }
 
     const handleSearch = () => {
@@ -99,7 +105,7 @@ function Header({ onMenuClick, cartItemCount = 0 }) {
                     <ListItemText primary="Settings" />
                 </ListItem>
                 <Divider />
-                <ListItem button onClick={handleLogout}>
+                <ListItem button onClick={() => { }}>
                     <ListItemIcon>
                         <LogoutIcon sx={{ color: '#673430' }} />
                     </ListItemIcon>
@@ -302,34 +308,51 @@ function Header({ onMenuClick, cartItemCount = 0 }) {
                                     display: { xs: 'none', lg: 'block' }
                                 }}
                             >
-                                Welcome, {user.name || 'User'}
+                                Welcome, {user.firstName || 'User'}
                             </Typography>
                         )}
                     </Box>
                 </Toolbar>
             </AppBar>
 
+
             <Menu
                 anchorEl={profileMenuAnchor}
                 open={Boolean(profileMenuAnchor)}
                 onClose={handleProfileMenuClose}
             >
-                <MenuItem onClick={handleProfileMenuClose}>
-                    <PersonIcon sx={{ mr: 2, color: '#673430' }} />
-                    Profile
-                </MenuItem>
-                <MenuItem onClick={handleProfileMenuClose}>
-                    <FavoriteIcon sx={{ mr: 2, color: '#673430' }} />
-                    Wishlist
-                </MenuItem>
-                <MenuItem onClick={handleProfileMenuClose}>
-                    <SettingsIcon sx={{ mr: 2, color: '#673430' }} />
-                    Settings
-                </MenuItem>
-                <MenuItem onClick={handleLogout}>
-                    <LogoutIcon sx={{ mr: 2, color: '#673430' }} />
-                    Logout
-                </MenuItem>
+                {isAuthenticated ?
+                    <>
+                        <MenuItem onClick={handleProfileMenuClose}>
+                            <PersonIcon sx={{ mr: 2, color: '#673430' }} />
+                            Profile
+                        </MenuItem>
+                        <MenuItem onClick={handleProfileMenuClose}>
+                            <FavoriteIcon sx={{ mr: 2, color: '#673430' }} />
+                            Wishlist
+                        </MenuItem>
+                        <MenuItem onClick={handleProfileMenuClose}>
+                            <SettingsIcon sx={{ mr: 2, color: '#673430' }} />
+                            Settings
+                        </MenuItem>
+                        <MenuItem onClick={handleLogout}>
+                            <LogoutIcon sx={{ mr: 2, color: '#673430' }} />
+                            Logout
+                        </MenuItem>
+                    </>
+                    :
+                    <>
+                        <MenuItem onClick={() => { navigate('/login') }}>
+                            <PersonIcon sx={{ mr: 2, color: '#673430' }} />
+                            Sign In
+                        </MenuItem>
+                        <MenuItem onClick={() => { navigate('/sign-up') }}>
+                            <FavoriteIcon sx={{ mr: 2, color: '#673430' }} />
+                            Sign Up
+                        </MenuItem>
+                    </>
+                }
+
             </Menu>
         </>
     )

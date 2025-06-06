@@ -39,6 +39,7 @@ const getItemById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
+    console.log('id', id);
     if (!id) {
       res.status(400).json({
         success: false,
@@ -479,10 +480,10 @@ const updateItem = async (req: Request, res: Response): Promise<void> => {
  *                   example: Error message details
  */
 //#region DELETE
-const deleteItem = async(req: Request, res: Response):Promise<void> => {
+const deleteItem = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.body;
-    
+
     if (!id) {
       res.status(400).json({
         success: false,
@@ -492,7 +493,7 @@ const deleteItem = async(req: Request, res: Response):Promise<void> => {
     }
 
     const deletedItem = await Item.findByIdAndDelete(id);
-    
+
     if (!deletedItem) {
       res.status(404).json({
         success: false,
@@ -505,7 +506,7 @@ const deleteItem = async(req: Request, res: Response):Promise<void> => {
       success: true,
       message: "Item deleted successfully"
     });
-    
+
   } catch (error) {
     console.error("Error deleting item:", error);
     res.status(500).json({

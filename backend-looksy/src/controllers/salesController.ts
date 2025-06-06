@@ -220,7 +220,7 @@ export const getSale = async (req: Request, res: Response) => {
             return res.status(400).json({ message: 'Sale ID required' });
         }
 
-        const sale = (await Sale.findById(saleId)).populated('sales.itemId');
+        const sale = await Sale.findById(saleId).populate('sales.itemId');
 
         if (!sale) {
             return res.status(404).json({ message: 'Sale not found' });

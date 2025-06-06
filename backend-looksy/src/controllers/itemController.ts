@@ -39,7 +39,6 @@ const getItemById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
-    console.log('id', id);
     if (!id) {
       res.status(400).json({
         success: false,

@@ -200,6 +200,25 @@ export const createSale = async (req: Request, res: Response) => {
     }
 }
 
+/**
+ * @swagger
+ * /api/sales:
+ *   get:
+ *     summary: Get all sales
+ *     tags: [Sales]
+ *     responses:
+ *       200:
+ *         description: List of all sales
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Sale'
+ *       500:
+ *         description: Server error
+ */
+
 export const getAllSales = async (req: Request, res: Response) => {
     try {
         const sales = await Sale.find()
@@ -212,6 +231,49 @@ export const getAllSales = async (req: Request, res: Response) => {
     }
 }
 
+/**
+ * @swagger
+ * /api/sales/{saleId}:
+ *   get:
+ *     summary: Get a sale by ID
+ *     tags: [Sales]
+ *     parameters:
+ *       - in: path
+ *         name: saleId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The sale ID
+ *     responses:
+ *       200:
+ *         description: Sale found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Sale'
+ *       400:
+ *         description: Sale ID required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Sale ID required
+ *       404:
+ *         description: Sale not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Sale not found
+ *       500:
+ *         description: Server error
+ */
 export const getSale = async (req: Request, res: Response) => {
     try {
         const { saleId } = req.params

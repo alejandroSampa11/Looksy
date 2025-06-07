@@ -5,29 +5,37 @@ import { useNavigate } from "react-router-dom";
 import apiAxios from "../config/cienteAxios";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { setUser } from '../redux/slices/userSlice';
 
 function LoginView() {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [login, setLogin] = useState({ username: '', password: '' });
 
-const handleLogin = async() => {
-    try {
-        const response = await apiAxios.post('/users/login', login);
-        console.log(response.data);
-        toast.success('¡Bienvenido!');
-        if (response.data.token) {
-            localStorage.setItem('token', response.data.token);
-        }
-        
-        if (response.data.data) {
-            localStorage.setItem('user', JSON.stringify(response.data.data));
-        }
+    const handleLogin = async () => {
+        try {
+            const response = await apiAxios.post('/users/login', login);
+            console.log(response.data);
+            toast.success('¡Bienvenido!');
+            if (response.data.token) {
+                localStorage.setItem('token', response.data.token);
+            }
 
-        navigate('/');
-    } catch (error) {
-        console.error('Login error:', error);
-    }
-};
+            if (response.data.data) {
+                localStorage.setItem('user', JSON.stringify(response.data.data));
+
+                dispatch(setUser({
+                    data: response.data.data,
+                    isAdmin: response.data.data.role === 'admin'
+                }));
+            }
+
+            navigate('/');
+        } catch (error) {
+            console.error('Login error:', error);
+        }
+    };
 
     return (
         <Box sx={{

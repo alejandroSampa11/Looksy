@@ -148,7 +148,6 @@ export const getByUsername = async (req: Request, res: Response) => {
     }
 
     const user = await User.findOne({ username }).select('+password');
-    console.log(user);
 
     if (!user) {
       return res.status(404).json({

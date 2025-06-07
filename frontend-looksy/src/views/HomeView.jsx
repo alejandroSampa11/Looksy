@@ -79,8 +79,6 @@ const products = [
 
 function HomeView() {
     const { userInfo, isAdmin } = useSelector(state => state.user);
-    console.log('info', userInfo)
-    console.log('isAdmin', isAdmin)
 
     return (
         <>

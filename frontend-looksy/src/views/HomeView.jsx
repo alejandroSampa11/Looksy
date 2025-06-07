@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material'
 import CardItem from '../components/CardItem'
+import { useSelector } from 'react-redux';
 
 const products = [
   {
@@ -77,6 +78,10 @@ const products = [
 ]
 
 function HomeView() {
+    const { userInfo, isAdmin } = useSelector(state => state.user);
+    console.log('info', userInfo)
+    console.log('isAdmin', isAdmin)
+
     return (
         <>
             <Box

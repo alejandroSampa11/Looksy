@@ -1,5 +1,6 @@
 import Item from "../models/Item";
 import { Request, Response } from "express";
+import StockUpdate from "../models/StockUpdate";
 
 //#region GET
 /**
@@ -516,6 +517,103 @@ const deleteItem = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+/**
+ * @swagger
+ * /api/item/stock/{id}:
+ *   put:
+ *     summary: Actualizar el stock de un artículo por ID
+ *     tags: [Items]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID del artículo a actualizar
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               stock:
+ *                 type: number
+ *                 description: Nuevo stock del artículo
+ *     responses:
+ *       200:
+ *         description: Stock actualizado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Stock updated successfully
+ *       400:
+ *         description: ID no proporcionado o stock inválido
+ *       404:
+ *         description: Artículo no encontrado
+ */
+const updateStock = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id, stock, userId } = req.body;
+
+    const missingFields = [];
+    if (!id) {
+      missingFields.push('Item id');
+    }
+    if (!stock) {
+      missingFields.push('Stock');
+    }
+
+    if (missingFields.length > 0) {
+      res.status(400).json({ message: `Missing fields: ${missingFields.join(', ')}` })
+      return;
+    }
+
+    if (typeof stock !== 'number' || stock < 0) {
+      res.status(400).json({ message: 'Stock must be a positive number' });
+      return;
+    }
+
+    const updatedItem = await Item.findByIdAndUpdate(
+      id,
+      { $inc: { stock } },
+      { new: true, runValidators: true }
+    );
+    if (!updateItem) {
+      res.status(404).json({ message: 'Item not found' });
+      return;
+    }
+
+    await StockUpdate.create({
+      item: id,
+      user: userId,
+      stock,
+      updatedAt: new Date()
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Stock updated successfully',
+      data: updatedItem
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Stock updated succesfully',
+      data: updateItem
+    });
+  } catch (error: any) {
+    res.status(500).json({ message: 'Error al actualizar el stock', error: error.message });
+  }
+}
+
 export {
   createItem,
   obtenerItemConSimilares,
@@ -523,5 +621,6 @@ export {
   getItemsByCategory,
   getAllItemsLimit50,
   updateItem,
-  deleteItem
+  deleteItem,
+  updateStock
 };

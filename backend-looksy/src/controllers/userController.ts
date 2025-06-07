@@ -383,6 +383,7 @@ export const createUser = async (req: Request, res: Response) => {
       { expiresIn: "1h" }
     );
 
+    console.log(`User created: ${username}`);
     res.status(201).json({
       message: "User created successfully",
       user: userResponse,
@@ -400,6 +401,6 @@ export const createUser = async (req: Request, res: Response) => {
         message: `${field} is already in use`,
       });
     }
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ message: `Server Error ${err}` });
   }
 };

@@ -27,7 +27,7 @@ function LoginView() {
 
                 dispatch(setUser({
                     data: response.data.data,
-                    isAdmin: response.data.data.role === 'admin'
+                    isAdmin: response.data.data.rol === 'admin'
                 }));
             }
 

@@ -16,8 +16,24 @@ import NotFoundView from './views/NotFoundView';
 import LayoutAdmin from './components/LayoutAdmin';
 import AdminView from './views/AdminView';
 import { ToastContainer } from 'react-toastify';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { setUser } from './redux/slices/userSlice';
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    if(user) {
+      const userData = JSON.parse(user);
+      dispatch(setUser({
+        data: userData,
+        isAdmin: userData.rol === 'admin'
+      }));
+    }
+  }, [dispatch]);
+
   return (
     <AuthProvider>
       <ToastContainer position="bottom-right" />

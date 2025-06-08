@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
 import apiAxios from '../../config/cienteAxios';
 import AddIcon from '@mui/icons-material/Add';
@@ -20,14 +20,62 @@ import {
 } from '@mui/material';
 
 function AddProduct(props) {
-    const { resetForm, formData, handleInputChange, categoryOptions, getCategoryNumber, getCategoryIcon } = props;
+    const { resetForm, formData, handleInputChange } = props;
+    const [categories, setCategories] = useState([]);
+    const [subcategories, setSubcategories] = useState([]);
+    const [loadingCategories, setLoadingCategories] = useState(false);
+    const [loadingSubcategories, setLoadingSubcategories] = useState(false);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            setLoadingCategories(true);
+            try {
+                const response = await apiAxios.get('/category/roots');
+                const categoriesData = response.data.data || response.data;
+                setCategories(categoriesData);
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+                toast.error('Error al cargar las categorías');
+                setCategories([]);
+            } finally {
+                setLoadingCategories(false);
+            }
+        };
+
+        fetchCategories();
+    }, []);
+
+    useEffect(() => {
+        const fetchSubcategories = async () => {
+            if (formData.category) {
+                setLoadingSubcategories(true);
+                try {
+                    const response = await apiAxios.get(`/category/${formData.category}/children`);
+                    const subcategoriesData = response.data.data || response.data;
+                    setSubcategories(subcategoriesData);
+                } catch (error) {
+                    console.error('Error fetching subcategories:', error);
+                    setSubcategories([]);
+                } finally {
+                    setLoadingSubcategories(false);
+                }
+            } else {
+                setSubcategories([]);
+            }
+        };
+
+        fetchSubcategories();
+    }, [formData.category]);
 
     const handleCreateProduct = async (e) => {
         e.preventDefault();
         try {
             const form = new FormData();
             form.append('nombre', formData.name);
-            form.append('categoria', getCategoryNumber(formData.category));
+            form.append('categoria', formData.category);
+            if (formData.subcategory) {
+                form.append('subcategoria', formData.subcategory);
+            }
             form.append('precio', parseFloat(formData.price));
             form.append('stock', parseInt(formData.stock));
             form.append('descripcion', formData.description);
@@ -55,6 +103,18 @@ function AddProduct(props) {
         if (file) {
             handleInputChange({ target: { name: 'imageUrl', value: file } });
         }
+    };
+
+    const getCategoryIcon = (categoryName) => {
+        const icons = {
+            'Jewelry': '💎',
+            'Aretes': '💍',
+            'Necklaces': '📿',
+            'Pulseras': '⚡',
+            'Rings': '💍',
+            'Accessories': '👜'
+        };
+        return icons[categoryName] || '📦';
     };
 
     return (
@@ -123,6 +183,8 @@ function AddProduct(props) {
                                 }}
                             />
                         </FormControl>
+
+                        {/* Category Select */}
                         <FormControl fullWidth variant="outlined">
                             <InputLabel>Category</InputLabel>
                             <Select
@@ -131,6 +193,7 @@ function AddProduct(props) {
                                 onChange={handleInputChange}
                                 required
                                 label="Category"
+                                disabled={loadingCategories}
                                 sx={{
                                     borderRadius: 2,
                                     '&:hover': {
@@ -143,16 +206,61 @@ function AddProduct(props) {
                                     }
                                 }}
                             >
-                                {categoryOptions.map((option) => (
-                                    <MenuItem key={option.value} value={option.value}>
+                                {categories.map((category) => (
+                                    <MenuItem key={category._id} value={category._id}>
                                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                            <span style={{ marginRight: 8 }}>{getCategoryIcon(option.value)}</span>
-                                            {option.label}
+                                            <span style={{ marginRight: 8 }}>
+                                                {getCategoryIcon(category.nombre)}
+                                            </span>
+                                            {category.nombre}
                                         </Box>
                                     </MenuItem>
                                 ))}
                             </Select>
+                            {loadingCategories && (
+                                <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+                                    Loading categories...
+                                </Typography>
+                            )}
                         </FormControl>
+
+                        {/* Subcategory Select */}
+                        <FormControl fullWidth variant="outlined">
+                            <InputLabel>Subcategory (Optional)</InputLabel>
+                            <Select
+                                name="subcategory"
+                                value={formData.subcategory || ''}
+                                onChange={handleInputChange}
+                                label="Subcategory (Optional)"
+                                disabled={!formData.category || loadingSubcategories}
+                                sx={{
+                                    borderRadius: 2,
+                                    '&:hover': {
+                                        boxShadow: '0 4px 12px rgba(103, 52, 48, 0.15)'
+                                    },
+                                    '&.Mui-focused': {
+                                        '& .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: '#673430'
+                                        }
+                                    }
+                                }}
+                            >
+                                <MenuItem value="">
+                                    <em>None</em>
+                                </MenuItem>
+                                {subcategories.map((subcategory) => (
+                                    <MenuItem key={subcategory._id} value={subcategory._id}>
+                                        {subcategory.nombre}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                            {loadingSubcategories && (
+                                <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+                                    Loading subcategories...
+                                </Typography>
+                            )}
+                        </FormControl>
+
                         <FormControl fullWidth>
                             <Box display={'flex'} flexDirection={'row'} gap={4}>
                                 <TextField
@@ -214,6 +322,7 @@ function AddProduct(props) {
                                 />
                             </Box>
                         </FormControl>
+
                         <TextField
                             fullWidth
                             label="Product Description"
@@ -240,6 +349,7 @@ function AddProduct(props) {
                                 }
                             }}
                         />
+
                         <FormControl fullWidth>
                             <Box display="flex" flexDirection="row" alignItems="center" gap={2}>
                                 <Box flex={1} display="flex" gap={1}>
@@ -301,6 +411,7 @@ function AddProduct(props) {
                                 </Box>
                             </Box>
                         </FormControl>
+
                         <Button
                             fullWidth
                             type="submit"

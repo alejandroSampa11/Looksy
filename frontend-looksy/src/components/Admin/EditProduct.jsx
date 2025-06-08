@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import apiAxios from '../../config/cienteAxios';
 import { toast } from 'react-toastify';
 import {
@@ -9,11 +9,12 @@ import EditIcon from '@mui/icons-material/Edit';
 
 function EditProduct(props) {
     const { selectedProduct, products, getStockColor, setSelectedProduct,
-        setFormData, getCategoryIcon, resetForm, formData, getCategoryNumber,
-        fetchProducts, handleInputChange, categoryOptions } = props;
+        setFormData,resetForm, formData, getCategoryNumber,
+        fetchProducts, handleInputChange} = props;
+
+    const [categories, setCategories] = useState({});
 
     const handleSelectProductToEdit = (product) => {
-        console.log(product);
         setSelectedProduct(product);
         setFormData({
             name: product.name,
@@ -24,6 +25,28 @@ function EditProduct(props) {
             imageUrl: product.imageUrl || ''
         });
     };
+    const fetchCategories = async () => {
+        try {
+            const response = await apiAxios.get('/category/roots');
+            const categoryMap = {};
+            response.data.data.forEach(category => {
+                categoryMap[category._id] = category.nombre;
+            });
+            setCategories(categoryMap);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        }
+    };
+
+    // Función para obtener el nombre de una categoría específica
+    const getCategoryName = (categoryId) => {
+        return categories[categoryId] || 'Unknown Category';
+    };
+
+    useEffect(() => {
+        fetchCategories();
+    }, []);
+
 
     const handleUpdateProduct = async (e) => {
         e.preventDefault();
@@ -51,6 +74,7 @@ function EditProduct(props) {
             toast.error(`Error updating product: ${error.message}`);
         }
     };
+
 
     return (
         <Card
@@ -138,8 +162,7 @@ function EditProduct(props) {
                                                 <Chip
                                                     label={
                                                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                            <span style={{ marginRight: 4 }}>{getCategoryIcon(product.category)}</span>
-                                                            {product.category}
+                                                            {getCategoryName(product.category)}
                                                         </Box>
                                                     }
                                                     size="small"
@@ -267,11 +290,10 @@ function EditProduct(props) {
                                                 }
                                             }}
                                         >
-                                            {categoryOptions.map((option) => (
-                                                <MenuItem key={option.value} value={option.value}>
+                                            {Object.entries(categories).map(([categoryId, categoryName]) => (
+                                                <MenuItem key={categoryId} value={categoryId}>
                                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                        <span style={{ marginRight: 8 }}>{getCategoryIcon(option.value)}</span>
-                                                        {option.label}
+                                                        {categoryName}
                                                     </Box>
                                                 </MenuItem>
                                             ))}

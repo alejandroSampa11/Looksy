@@ -2,7 +2,8 @@ import mongoose, { Document, Schema } from "mongoose";
 export interface IItem extends Document {
   id: string;
   nombre: string;
-  categoria: number;
+  categoria: string;
+  subcategoria?: mongoose.Types.ObjectId;
   precio: number;
   stock: number;
   descripcion: string;
@@ -17,8 +18,13 @@ const itemSchema: Schema<IItem> = new Schema({
     required: true,
   },
   categoria: {
-    type: Number,
+    type: String,
     required: true,
+  },
+  subcategoria: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Category",
+    required: false, // Opcional porque no todos los items tienen subcategoría
   },
   precio: {
     type: Number,
@@ -44,8 +50,8 @@ const itemSchema: Schema<IItem> = new Schema({
     type: Number,
     default: 0,
     min: 0,
-    max: 5
-  }
+    max: 5,
+  },
 });
 
 const Item = mongoose.model<IItem>("Item", itemSchema);

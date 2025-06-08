@@ -84,7 +84,7 @@ const getItemById = async (req: Request, res: Response): Promise<void> => {
  *         required: true
  *         description: ID numérico de la categoría
  *         schema:
- *           type: integer
+ *           type: string
  *           example: 1
  *     responses:
  *       200:
@@ -112,7 +112,7 @@ const getItemsByCategory = async (
   try {
     const { category } = req.params;
 
-    if (!category || isNaN(Number(category))) {
+    if (!category) {
       res.status(400).json({
         success: false,
         message: "Categoría inválida o no proporcionada",
@@ -120,7 +120,7 @@ const getItemsByCategory = async (
       return;
     }
 
-    const items = await Item.find({ categoria: Number(category) });
+    const items = await Item.find({ categoria: category });
 
     res.status(200).json({
       success: true,
@@ -412,7 +412,7 @@ const getAllItemsLimit50 = async (
 
 const createItem = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { nombre, categoria, precio, stock, descripcion } = req.body;
+    const { nombre, categoria, precio, stock, descripcion, subcategoria } = req.body;
     const missingFields = [];
 
     if (!nombre) missingFields.push("Nombre del Producto");
@@ -436,6 +436,7 @@ const createItem = async (req: Request, res: Response): Promise<void> => {
     const item = new Item({
       nombre,
       categoria,
+      subcategoria: subcategoria || null,
       precio,
       stock,
       descripcion,
@@ -811,10 +812,76 @@ const searchItem = async (req: Request, res: Response): Promise<void> => {
 }
 
 
+/**
+ * @swagger
+ * /api/item/subcategory/{subcategoryId}:
+ *   get:
+ *     summary: Obtener todos los artículos por subcategoría
+ *     tags: [Items]
+ *     parameters:
+ *       - in: path
+ *         name: subcategoryId
+ *         required: true
+ *         description: ID de la subcategoría
+ *         schema:
+ *           type: string
+ *           example: "675aa1d199a7f99ddab6b123"
+ *     responses:
+ *       200:
+ *         description: Lista de artículos en esa subcategoría
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Item'
+ *       400:
+ *         description: Subcategoría no proporcionada
+ *       500:
+ *         description: Error del servidor
+ */
+const getItemsBySubcategory = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { subcategoryId } = req.params;
+
+    if (!subcategoryId) {
+      res.status(400).json({
+        success: false,
+        message: "ID de subcategoría requerido",
+      });
+      return;
+    }
+
+    const items = await Item.find({ subcategoria: subcategoryId })
+      .populate('subcategoria', 'nombre'); // Populate para obtener nombre de subcategoría
+
+    res.status(200).json({
+      success: true,
+      data: items,
+    });
+  } catch (error) {
+    console.error("Error fetching items by subcategory:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error del servidor",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
+
 export {
   createItem,
   obtenerItemConSimilares,
   getItemById,
+  getItemsBySubcategory,
   getItemsByCategory,
   getAllItemsLimit50,
   searchItem,

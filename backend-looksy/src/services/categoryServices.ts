@@ -1,6 +1,6 @@
-import { Category } from '../models/Category';
-import { ICategory, ICategoryResponse } from '../models/Category'; 
-import { ValidationUtils } from '../utils/validation';
+import { Category } from "../models/Category";
+import { ICategory, ICategoryResponse } from "../models/Category";
+import { ValidationUtils } from "../utils/validation";
 
 /**
  * @openapi
@@ -67,14 +67,15 @@ import { ValidationUtils } from '../utils/validation';
  *           example: null
  */
 
-
 export class CategoryService {
-  
   // Crear categoría
-  static async createCategory(nombre: string, parentId?: string): Promise<ICategory> {
+  static async createCategory(
+    nombre: string,
+    parentId?: string
+  ): Promise<ICategory> {
     const categoryData = {
       nombre: ValidationUtils.sanitizeName(nombre),
-      parentId: parentId || null
+      parentId: parentId || null,
     };
 
     const newCategory = new Category(categoryData);
@@ -87,24 +88,27 @@ export class CategoryService {
   }
 
   // Construir árbol de categorías
-  static buildCategoryTree(categories: ICategory[], parentId: string | null = null): ICategoryResponse[] {
+  static buildCategoryTree(
+    categories: ICategory[],
+    parentId: string | null = null
+  ): ICategoryResponse[] {
     return categories
-      .filter(cat => {
+      .filter((cat) => {
         if (parentId === null) return cat.parentId === null;
         return cat.parentId?.toString() === parentId;
       })
-      .map(cat => ({
+      .map((cat) => ({
         _id: cat._id.toString(),
         nombre: cat.nombre,
         parentId: cat.parentId?.toString() || null,
-        children: this.buildCategoryTree(categories, cat._id.toString())
+        children: this.buildCategoryTree(categories, cat._id.toString()),
       }));
   }
 
   // Obtener categorías raíz
   static async getRootCategories(): Promise<ICategoryResponse[]> {
     const roots = await Category.find({ parentId: null }).lean();
-    
+
     return await Promise.all(
       roots.map(async (root) => {
         const hasChildren = await Category.exists({ parentId: root._id });
@@ -112,16 +116,18 @@ export class CategoryService {
           _id: root._id.toString(),
           nombre: root.nombre,
           parentId: null,
-          hasChildren: !!hasChildren
+          hasChildren: !!hasChildren,
         };
       })
     );
   }
 
   // Obtener hijos de una categoría
-  static async getCategoryChildren(parentId: string): Promise<ICategoryResponse[]> {
+  static async getCategoryChildren(
+    parentId: string
+  ): Promise<ICategoryResponse[]> {
     const children = await Category.find({ parentId }).lean();
-    
+
     return await Promise.all(
       children.map(async (child) => {
         const hasChildren = await Category.exists({ parentId: child._id });
@@ -129,19 +135,23 @@ export class CategoryService {
           _id: child._id.toString(),
           nombre: child.nombre,
           parentId: child.parentId?.toString() || null,
-          hasChildren: !!hasChildren
+          hasChildren: !!hasChildren,
         };
       })
     );
   }
 
   // Actualizar categoría
-  static async updateCategory(id: string, nombre: string, parentId?: string): Promise<ICategory | null> {
+  static async updateCategory(
+    id: string,
+    nombre: string,
+    parentId?: string
+  ): Promise<ICategory | null> {
     return await Category.findByIdAndUpdate(
       id,
       {
         nombre: ValidationUtils.sanitizeName(nombre),
-        parentId: parentId || null
+        parentId: parentId || null,
       },
       { new: true }
     );
@@ -165,43 +175,171 @@ export class CategoryService {
   }
 
   /**
- * @openapi
- * /api/category/{id}:
+   * @openapi
+   * /api/category/{id}:
+   *   get:
+   *     summary: Obtener una categoría por su ID
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *         description: ID de la categoría
+   *     responses:
+   *       200:
+   *         description: Categoría encontrada
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Category'
+   *       404:
+   *         description: Categoría no encontrada
+   */
+  static async getCategoryById(id: string): Promise<ICategoryResponse | null> {
+    const category = await Category.findById(id).lean();
+
+    if (!category) {
+      return null;
+    }
+
+    // Verificar si tiene hijos
+    const hasChildren = await this.hasChildren(id);
+
+    return {
+      _id: category._id.toString(),
+      nombre: category.nombre,
+      parentId: category.parentId?.toString() || null,
+      hasChildren,
+      children: hasChildren ? await this.getCategoryChildren(id) : [],
+    };
+  }
+
+  /**
+ * @swagger
+ * /api/category/{id}/parent:
  *   get:
- *     summary: Obtener una categoría por su ID
+ *     summary: Get parent category of a specific category
+ *     description: Retrieve the parent category of a given category by its ID. Returns null for root categories.
+ *     tags: [Categories]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: string
- *         description: ID de la categoría
+ *         description: ID of the category to get its parent
+ *         example: 60d21b4667d0d8992e610c86
  *     responses:
  *       200:
- *         description: Categoría encontrada
+ *         description: Parent category retrieved successfully or category is root
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Category'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: 60d21b4667d0d8992e610c85
+ *                     nombre:
+ *                       type: string
+ *                       example: Electronics
+ *                     parentId:
+ *                       type: string
+ *                       nullable: true
+ *                       example: null
+ *                     hasChildren:
+ *                       type: boolean
+ *                       example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Esta es una categoría raíz"
  *       404:
- *         description: Categoría no encontrada
+ *         description: Category not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Categoría no encontrada
+ *       400:
+ *         description: Invalid category ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Invalid category ID
+ *       500:
+ *         description: Server error
  */
-static async getCategoryById(id: string): Promise<ICategoryResponse | null> {
-  const category = await Category.findById(id).lean();
-  
+
+// Obtener categoría padre mejorado
+static async getParentCategory(
+  categoryId: string
+): Promise<{ 
+  parent: ICategoryResponse | null; 
+  isRoot: boolean; 
+  categoryExists: boolean 
+}> {
+  const category = await Category.findById(categoryId).lean();
+
   if (!category) {
-    return null;
+    return {
+      parent: null,
+      isRoot: false,
+      categoryExists: false
+    };
   }
 
-  // Verificar si tiene hijos
-  const hasChildren = await this.hasChildren(id);
-  
+  // Si no tiene parentId, es una categoría raíz
+  if (!category.parentId) {
+    return {
+      parent: null,
+      isRoot: true,
+      categoryExists: true
+    };
+  }
+
+  // Obtenemos la categoría padre
+  const parentCategory = await Category.findById(category.parentId).lean();
+
+  if (!parentCategory) {
+    return {
+      parent: null,
+      isRoot: false,
+      categoryExists: true
+    };
+  }
+
+  const hasChildren = await Category.exists({ parentId: parentCategory._id });
+
   return {
-    _id: category._id.toString(),
-    nombre: category.nombre,
-    parentId: category.parentId?.toString() || null,
-    hasChildren,
-    children: hasChildren ? await this.getCategoryChildren(id) : []
+    parent: {
+      _id: parentCategory._id.toString(),
+      nombre: parentCategory.nombre,
+      parentId: parentCategory.parentId?.toString() || null,
+      hasChildren: !!hasChildren,
+    },
+    isRoot: false,
+    categoryExists: true
   };
 }
 }

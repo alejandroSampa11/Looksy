@@ -7,12 +7,14 @@ import { setProducts, setTotalPages } from '../redux/slices/productSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import Filter from '../components/Filter';
 
-export async function fetchProducts(filterStr, page, sortQ) {
+export async function fetchProducts(filterStr, page, sortQ, minPrice, maxPrice) {
   try {
     const response = await apiAxios.post(`/item/getItems/${page > 0 ? page : 1}`,
       {
         filterString: filterStr,
-        sort: sortQ
+        sort: sortQ,
+        minPrice: minPrice,
+        maxPrice: maxPrice
       });
     return response.data;
   } catch (e) {
@@ -23,7 +25,7 @@ export async function fetchProducts(filterStr, page, sortQ) {
 function HomeView() {
     const dispatch = useDispatch();
     const { userInfo, isAdmin } = useSelector(state => state.user);
-    const { searchFilter, sort } = useSelector(state => state.searchFilter);
+    const { searchFilter, sort, minPrice, maxPrice } = useSelector(state => state.searchFilter);
     const { items: products, totalPages } = useSelector(state => state.products);
     const [isLoading, setIsLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -31,13 +33,13 @@ function HomeView() {
     useEffect(() => {
       (async () => {
         if (page <= totalPages) {
-          const productsResponse = await fetchProducts(searchFilter, page, sort);
+          const productsResponse = await fetchProducts(searchFilter, page, sort, minPrice, maxPrice);
           dispatch(setProducts(productsResponse.data));
           dispatch(setTotalPages(productsResponse.totalPages));
         }
         setIsLoading(false);
       })()
-    }, [page, sort, searchFilter, dispatch])
+    }, [page, sort, searchFilter, maxPrice, minPrice, dispatch])
 
     if (isLoading) {
         return (
@@ -78,10 +80,10 @@ function HomeView() {
                 display: 'block',
                 marginTop: 6
             }}>
-                <Filter/>
                 <Typography sx={{ color: '#000000', textAlign: 'center' }} variant="h4">
                     Worn Beautifully.
                 </Typography>
+                <Filter/>
             </Box>
             <Box
                 sx={{

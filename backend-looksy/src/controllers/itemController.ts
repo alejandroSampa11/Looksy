@@ -268,9 +268,9 @@ const getAllItemsLimit50 = async (
     const validSort = sort === 1 || sort === -1;
     const [items, total] = await Promise.all([
       Item.find(query)
-      .sort(validSort ? { precio: sort, _id: 1 } : { createdAt: 1, _id: 1 })
-      .skip(skip)
-      .limit(limit),
+        .sort(validSort ? { precio: sort, _id: 1 } : { createdAt: 1, _id: 1 })
+        .skip(skip)
+        .limit(limit),
       Item.countDocuments(query)
     ]);
 

@@ -1,12 +1,7 @@
 import React, { useState, useEffect, use } from 'react';
 import apiAxios from '../../config/cienteAxios';
 import { toast } from 'react-toastify';
-import {
-    Box, Typography, TextField, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton,
-    Select, MenuItem, FormControl, InputLabel, Grid, Avatar, Card, CardContent, Divider, Chip, Stack, alpha
-} from '@mui/material';
-import { FiOctagon } from 'react-icons/fi';
-import EditIcon from '@mui/icons-material/Edit';
+import { Card, CardContent } from '@mui/material';
 import LoadingSpinner from '../LoadingSpinner';
 import TopSalesman from './StatiticsComponents/TopSalesman';
 import TopSales from './StatiticsComponents/TopSales';

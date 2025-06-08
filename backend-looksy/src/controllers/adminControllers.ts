@@ -73,6 +73,7 @@ export const getTopSalesman = async (req, res) => {
             },
             { $unwind: '$salesman' },
             { $sort: { totalRevenue: -1 } },
+            { $limit: 10 },
             {
                 $project: {
                     _id: 0,
@@ -86,5 +87,24 @@ export const getTopSalesman = async (req, res) => {
         res.json(topSalesman)
     } catch (error: any) {
         res.status(500).json({ message: `Error fetching top salesman: ${error.message}` });
+    }
+}
+
+export const getTotalRevenuePerYear =  async (req, res) => {
+    try {
+        const totalRevenue = await Sale.aggregate([
+            { $unwind: '$sales' },
+            {
+                $group: {
+                    _id: { year: { $year: '$date' } },
+                    totalRevenue: { $sum: { $multiply: ['$sales.price', '$sales.amountOf'] } }
+                }
+            },
+            { $sort: { '_id.year': 1 }}
+        ]);
+
+        res.json(totalRevenue);
+    } catch (error: any) {
+        res.status(500).json({ message: `Error fetching top salesman: ${error.message}` })
     }
 }

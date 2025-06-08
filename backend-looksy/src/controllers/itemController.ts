@@ -156,9 +156,9 @@ const obtenerItemConSimilares = async (req: Request, res: Response) => {
 
 /**
  * @swagger
- * /api/item:
+ * /api/item/:id:
  *   get:
- *     summary: Get all items with a limit of 50
+ *     summary: Get all items with a limit of 50 and
  *     description: Retrieve a list of all items from the database with a maximum limit of 50 items
  *     tags: [Items]
  *     responses:
@@ -224,17 +224,50 @@ const obtenerItemConSimilares = async (req: Request, res: Response) => {
  *                   type: string
  *                   example: Error message details
  */
+const getAllItems = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const items = await Item.find();
+    res.status(200).json({
+      success: true,
+      data: items,
+    });
+  } catch (error) {
+    console.error("Error fetching items:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error del servidor",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
+
+
 const getAllItemsLimit50 = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const items = await Item.find().limit(50);
+    const page = parseInt(req.params.page, 10) || 1;
+    const limit = 50;
+    const skip = (page - 1) * limit;
+
+    const [items, total] = await Promise.all([
+      Item.find().sort({ createdAt: 1 }).skip(skip).limit(limit),
+      Item.countDocuments()
+    ]);
+
+    const totalPages = Math.ceil(total/limit);
+    const hasNextPage = page < totalPages;
 
     res.status(200).json({
-      success: true,
-      data: items,
+      nextPage: hasNextPage ? page + 1 : null,
+      totalPages,
+      data: items
     });
+
   } catch (error) {
     console.error("Error fetching items:", error);
     res.status(500).json({
@@ -764,6 +797,7 @@ export {
   getItemById,
   getItemsByCategory,
   getAllItemsLimit50,
+  getAllItems,
   updateItem,
   deleteItem,
   updateStock,

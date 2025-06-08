@@ -55,7 +55,6 @@ function AdminView() {
   const fetchProducts = async () => {
     try {
       const response = await apiAxios.get('/item');
-      console.log(response);
       if (response.status === 200) {
         const transformedProducts = response.data.data.map(item => ({
           id: item._id,
@@ -68,6 +67,7 @@ function AdminView() {
           sales: item.sales || 0,
           rating: item.rating || 4.5
         }));
+        console.log(response.data.data[0].imageUrl);
         setProducts(transformedProducts);
       }
     } catch (e) {

@@ -110,7 +110,6 @@ const getItemsByCategory = async (
   res: Response
 ): Promise<void> => {
   try {
-    console.log(req.params);
     const { category } = req.params;
 
     if (!category || isNaN(Number(category))) {

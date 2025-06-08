@@ -381,8 +381,6 @@ export const createUser = async (req: Request, res: Response) => {
       process.env.JWT_SECRET!,
       { expiresIn: "1h" }
     );
-
-    console.log(`User created: ${username}`);
     res.status(201).json({
       message: "User created successfully",
       user: userResponse,

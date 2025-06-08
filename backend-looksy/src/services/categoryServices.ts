@@ -3,6 +3,99 @@ import { ICategory, ICategoryResponse } from "../models/Category";
 import { ValidationUtils } from "../utils/validation";
 
 /**
+ * @swagger
+ * /api/category/{parentId}/children:
+ *   get:
+ *     summary: Obtener todas las subcategorías hijas de una categoría padre
+ *     description: Recupera todas las categorías que tienen como padre la categoría especificada por su ID
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: path
+ *         name: parentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la categoría padre
+ *         example: "60d21b4667d0d8992e610c85"
+ *     responses:
+ *       200:
+ *         description: Lista de subcategorías recuperada exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         description: ID único de la subcategoría
+ *                         example: "60d21b4667d0d8992e610c86"
+ *                       nombre:
+ *                         type: string
+ *                         description: Nombre de la subcategoría
+ *                         example: "Smartphones"
+ *                       parentId:
+ *                         type: string
+ *                         description: ID de la categoría padre
+ *                         example: "60d21b4667d0d8992e610c85"
+ *                       hasChildren:
+ *                         type: boolean
+ *                         description: Indica si esta subcategoría tiene hijos
+ *                         example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Subcategorías encontradas"
+ *       400:
+ *         description: ID de categoría padre inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "ID de categoría padre requerido"
+ *       404:
+ *         description: Categoría padre no encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Categoría padre no encontrada"
+ *       500:
+ *         description: Error del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Error del servidor"
+ *                 error:
+ *                   type: string
+ *                   example: "Database connection failed"
+ */
+/**
  * @openapi
  * /api/category:
  *   post:
@@ -105,6 +198,85 @@ export class CategoryService {
       }));
   }
 
+  /**
+   * @swagger
+   * /api/category/roots:
+   *   get:
+   *     summary: Obtener todas las categorías raíz
+   *     description: Recupera todas las categorías que no tienen padre (categorías principales del sistema)
+   *     tags: [Categories]
+   *     responses:
+   *       200:
+   *         description: Lista de categorías raíz recuperada exitosamente
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 data:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       _id:
+   *                         type: string
+   *                         description: ID único de la categoría raíz
+   *                         example: "60d21b4667d0d8992e610c85"
+   *                       nombre:
+   *                         type: string
+   *                         description: Nombre de la categoría raíz
+   *                         example: "Electronics"
+   *                       parentId:
+   *                         type: null
+   *                         description: Siempre null para categorías raíz
+   *                         example: null
+   *                       hasChildren:
+   *                         type: boolean
+   *                         description: Indica si esta categoría raíz tiene subcategorías
+   *                         example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Categorías raíz encontradas"
+   *                 count:
+   *                   type: integer
+   *                   description: Número total de categorías raíz
+   *                   example: 4
+   *       404:
+   *         description: No hay categorías raíz en el sistema
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: false
+   *                 message:
+   *                   type: string
+   *                   example: "No se encontraron categorías raíz"
+   *                 data:
+   *                   type: array
+   *                   example: []
+   *       500:
+   *         description: Error del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: false
+   *                 message:
+   *                   type: string
+   *                   example: "Error del servidor"
+   *                 error:
+   *                   type: string
+   *                   example: "Database connection failed"
+   */
   // Obtener categorías raíz
   static async getRootCategories(): Promise<ICategoryResponse[]> {
     const roots = await Category.find({ parentId: null }).lean();
@@ -216,130 +388,128 @@ export class CategoryService {
   }
 
   /**
- * @swagger
- * /api/category/{id}/parent:
- *   get:
- *     summary: Get parent category of a specific category
- *     description: Retrieve the parent category of a given category by its ID. Returns null for root categories.
- *     tags: [Categories]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: ID of the category to get its parent
- *         example: 60d21b4667d0d8992e610c86
- *     responses:
- *       200:
- *         description: Parent category retrieved successfully or category is root
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   nullable: true
- *                   properties:
- *                     _id:
- *                       type: string
- *                       example: 60d21b4667d0d8992e610c85
- *                     nombre:
- *                       type: string
- *                       example: Electronics
- *                     parentId:
- *                       type: string
- *                       nullable: true
- *                       example: null
- *                     hasChildren:
- *                       type: boolean
- *                       example: true
- *                 message:
- *                   type: string
- *                   example: "Esta es una categoría raíz"
- *       404:
- *         description: Category not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: false
- *                 message:
- *                   type: string
- *                   example: Categoría no encontrada
- *       400:
- *         description: Invalid category ID
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: false
- *                 message:
- *                   type: string
- *                   example: Invalid category ID
- *       500:
- *         description: Server error
- */
+   * @swagger
+   * /api/category/{id}/parent:
+   *   get:
+   *     summary: Get parent category of a specific category
+   *     description: Retrieve the parent category of a given category by its ID. Returns null for root categories.
+   *     tags: [Categories]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *         description: ID of the category to get its parent
+   *         example: 60d21b4667d0d8992e610c86
+   *     responses:
+   *       200:
+   *         description: Parent category retrieved successfully or category is root
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 data:
+   *                   type: object
+   *                   nullable: true
+   *                   properties:
+   *                     _id:
+   *                       type: string
+   *                       example: 60d21b4667d0d8992e610c85
+   *                     nombre:
+   *                       type: string
+   *                       example: Electronics
+   *                     parentId:
+   *                       type: string
+   *                       nullable: true
+   *                       example: null
+   *                     hasChildren:
+   *                       type: boolean
+   *                       example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Esta es una categoría raíz"
+   *       404:
+   *         description: Category not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: false
+   *                 message:
+   *                   type: string
+   *                   example: Categoría no encontrada
+   *       400:
+   *         description: Invalid category ID
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: false
+   *                 message:
+   *                   type: string
+   *                   example: Invalid category ID
+   *       500:
+   *         description: Server error
+   */
 
-// Obtener categoría padre mejorado
-static async getParentCategory(
-  categoryId: string
-): Promise<{ 
-  parent: ICategoryResponse | null; 
-  isRoot: boolean; 
-  categoryExists: boolean 
-}> {
-  const category = await Category.findById(categoryId).lean();
+  // Obtener categoría padre mejorado
+  static async getParentCategory(categoryId: string): Promise<{
+    parent: ICategoryResponse | null;
+    isRoot: boolean;
+    categoryExists: boolean;
+  }> {
+    const category = await Category.findById(categoryId).lean();
 
-  if (!category) {
+    if (!category) {
+      return {
+        parent: null,
+        isRoot: false,
+        categoryExists: false,
+      };
+    }
+
+    // Si no tiene parentId, es una categoría raíz
+    if (!category.parentId) {
+      return {
+        parent: null,
+        isRoot: true,
+        categoryExists: true,
+      };
+    }
+
+    // Obtenemos la categoría padre
+    const parentCategory = await Category.findById(category.parentId).lean();
+
+    if (!parentCategory) {
+      return {
+        parent: null,
+        isRoot: false,
+        categoryExists: true,
+      };
+    }
+
+    const hasChildren = await Category.exists({ parentId: parentCategory._id });
+
     return {
-      parent: null,
+      parent: {
+        _id: parentCategory._id.toString(),
+        nombre: parentCategory.nombre,
+        parentId: parentCategory.parentId?.toString() || null,
+        hasChildren: !!hasChildren,
+      },
       isRoot: false,
-      categoryExists: false
+      categoryExists: true,
     };
   }
-
-  // Si no tiene parentId, es una categoría raíz
-  if (!category.parentId) {
-    return {
-      parent: null,
-      isRoot: true,
-      categoryExists: true
-    };
-  }
-
-  // Obtenemos la categoría padre
-  const parentCategory = await Category.findById(category.parentId).lean();
-
-  if (!parentCategory) {
-    return {
-      parent: null,
-      isRoot: false,
-      categoryExists: true
-    };
-  }
-
-  const hasChildren = await Category.exists({ parentId: parentCategory._id });
-
-  return {
-    parent: {
-      _id: parentCategory._id.toString(),
-      nombre: parentCategory.nombre,
-      parentId: parentCategory.parentId?.toString() || null,
-      hasChildren: !!hasChildren,
-    },
-    isRoot: false,
-    categoryExists: true
-  };
-}
 }

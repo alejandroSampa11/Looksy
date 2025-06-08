@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Typography, CircularProgress } from '@mui/material';
+import { Box, Typography, CircularProgress, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import apiAxios from '../config/cienteAxios';
+import CardItem from '../components/CardItem';
 
 function CategoryView() {
   const { categoryId } = useParams();
@@ -10,20 +11,49 @@ function CategoryView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const [products, setProducts] = useState([]);
+
+  const categoryBanners = {
+    'Rings': '/bannerEarrings.webp',
+    'Necklaces': '/bannerNeck.webp',
+    // Add more mappings as needed
+  };
+
+  const getBannerImage = () => {
+    if (category?.banner) {
+      return category.banner;
+    }
+    return categoryBanners[category?.nombre] || '/bannerNew.webp';
+  };
+
+  getBannerImage();
 
   useEffect(() => {
+    const fetchProducts = async (categoryData) => {
+      try {
+        let endpoint;
+
+        if (categoryData?.hasChildren && categoryData?.children.length > 0) {
+          endpoint = `/item/category/${categoryData._id}`;
+        } else {
+          endpoint = `/item/subcategory/${categoryData._id}`;
+        }
+        const data = await apiAxios.get(endpoint);
+        setProducts(data.data.data);
+      } catch (err) {
+        console.error('Error fetching category:', err);
+        setError(err.response?.data?.message || err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
     const fetchCategory = async () => {
       try {
         setLoading(true);
-        console.log('Fetching category with ID:', categoryId);
-        
-        // Use your configured apiAxios and correct endpoint
-        const response = await apiAxios.get(`/category/${categoryId}`);
-        console.log('Category response:', response.data);
-        
-        // Handle different response structures
-        const categoryData = response.data.data || response.data;
-        setCategory(categoryData);
+        const data = await apiAxios.get(`/category/${categoryId}`)
+        setCategory(data.data.data);
+        return data.data.data;
       } catch (err) {
         console.error('Error fetching category:', err);
         setError(err.response?.data?.message || err.message);
@@ -32,18 +62,28 @@ function CategoryView() {
       }
     };
 
-    if (categoryId) {
-      fetchCategory();
-    }
+    const fetchData = async () => {
+      if (categoryId) {
+        try {
+          setLoading(true);
+          const categoryData = await fetchCategory();
+          await fetchProducts(categoryData);
+        } catch (err) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchData();
   }, [categoryId]);
 
   if (loading) {
     return (
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '50vh' 
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '50vh'
       }}>
         <CircularProgress />
       </Box>
@@ -52,11 +92,11 @@ function CategoryView() {
 
   if (error) {
     return (
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '50vh' 
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '50vh'
       }}>
         <Typography color="error">Error: {error}</Typography>
       </Box>
@@ -64,8 +104,7 @@ function CategoryView() {
   }
 
   return (
-    <Box sx={{ mt: 8 }}> {/* Add margin top to account for header */}
-      {/* Banner Image */}
+    <Box sx={{ mt: 8 }}>
       <Box
         component="img"
         sx={{
@@ -75,28 +114,28 @@ function CategoryView() {
           objectFit: 'cover',
           display: 'block',
         }}
-        src={'/bannerEarrings.webp'} // Remove /public/ from path
-        alt={`Banner ${category?.nombre || 'Category'}`}
+        src={getBannerImage()}
+        alt={`Banner ${category?.nombre || 'New Arrivals'}`}
         onError={(e) => {
-          e.target.src = '/defaultBanner.webp'; // Fallback image
+          e.target.src = '/defaultBanner.webp';
         }}
       />
-      
+
       {/* Category Info */}
       <Box sx={{
         padding: 4,
         textAlign: 'center'
       }}>
-        <Typography variant="h3" sx={{ 
-          color: '#673430', 
+        <Typography variant="h3" sx={{
+          color: '#673430',
           fontWeight: 'bold',
           mb: 2
         }}>
           {category?.nombre || 'Categoría'}
         </Typography>
-        
-        <Typography variant="h6" sx={{ 
-          color: '#666', 
+
+        <Typography variant="h6" sx={{
+          color: '#666',
           maxWidth: 800,
           mx: 'auto'
         }}>
@@ -109,14 +148,14 @@ function CategoryView() {
             <Typography variant="h5" sx={{ mb: 2, color: '#673430' }}>
               Subcategorías
             </Typography>
-            <Box sx={{ 
-              display: 'flex', 
-              flexWrap: 'wrap', 
+            <Box sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
               justifyContent: 'center',
-              gap: 2 
+              gap: 2
             }}>
               {category.hijos.map((child) => (
-                <Box 
+                <Box
                   key={child._id}
                   sx={{
                     p: 2,
@@ -135,6 +174,31 @@ function CategoryView() {
             </Box>
           </Box>
         )}
+        {products && products.length > 0 && (
+          <Box sx={{ mt: 6 }}>
+            <Grid container spacing={3} justifyContent="center">
+              {products.map((product) => (
+                <Grid item key={product._id} xs={12} sm={6} md={4} lg={3}>
+                  <CardItem
+                    imagen={product.imageUrl}
+                    nombre={product.nombre}
+                    precio={product.precio}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        )}
+
+        {/* No products message */}
+        {products && products.length === 0 && (
+          <Box sx={{ mt: 6 }}>
+            <Typography variant="h6" sx={{ color: '#666' }}>
+              No hay productos disponibles en esta categoría.
+            </Typography>
+          </Box>
+        )}
+
       </Box>
     </Box>
   );

@@ -16,7 +16,6 @@ function LoginView() {
     const handleLogin = async () => {
         try {
             const response = await apiAxios.post('/users/login', login);
-            console.log(response.data);
             toast.success('¡Bienvenido!');
             if (response.data.token) {
                 localStorage.setItem('token', response.data.token);

@@ -1,18 +1,42 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Swal from 'sweetalert2';
 import apiAxios from '../../config/cienteAxios';
 import { toast } from 'react-toastify';
-import {Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead,
-  TableRow, IconButton,  Avatar, Card, CardContent, Divider, Chip, Stack, alpha} from '@mui/material';
+import {
+    Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead,
+    TableRow, IconButton, Avatar, Card, CardContent, Divider, Chip, Stack, alpha
+} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InventoryIcon from '@mui/icons-material/Inventory';
 
 
 function DeleteProduct(props) {
-    const { products, getCategoryIcon, getStockColor, fetchProducts } = props;
+    const { products, getStockColor, fetchProducts } = props;
+    const [categories, setCategories] = useState({});
+
+    const fetchCategories = async () => {
+        try {
+            const response = await apiAxios.get('/category/roots');
+            const categoryMap = {};
+            response.data.data.forEach(category => {
+                categoryMap[category._id] = category.nombre;
+            });
+            setCategories(categoryMap);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        }
+    };
+
+    // Función para obtener el nombre de una categoría específica
+    const getCategoryName = (categoryId) => {
+        return categories[categoryId] || 'Unknown Category';
+    };
+
+    useEffect(() => {
+        fetchCategories();
+    }, []);
 
     const handleDeleteProduct = async (productId) => {
-        console.log(productId);
         Swal.fire({
             title: "Are you sure?",
             text: "You won't be able to revert this!",
@@ -115,8 +139,7 @@ function DeleteProduct(props) {
                                         <Chip
                                             label={
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    <span style={{ marginRight: 4 }}>{getCategoryIcon(product.category)}</span>
-                                                    {product.category}
+                                                    {getCategoryName(product.category)}
                                                 </Box>
                                             }
                                             size="small"

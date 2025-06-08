@@ -7,7 +7,6 @@ export class CategoryController {
   static async create(req: Request, res: Response) {
     try {
       const { nombre, parentId } = req.body;
-      console.log(req.body);
 
       // Validaciones
       if (!ValidationUtils.isValidName(nombre)) {
@@ -70,11 +69,23 @@ export class CategoryController {
     try {
       const roots = await CategoryService.getRootCategories();
 
+      if (roots.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "No se encontraron categorías raíz",
+          data: [],
+          count: 0,
+        } as IApiResponse<ICategoryResponse[]>);
+      }
+
       res.json({
         success: true,
         data: roots,
+        message: "Categorías raíz encontradas exitosamente",
+        count: roots.length,
       } as IApiResponse<ICategoryResponse[]>);
     } catch (error) {
+      console.error("Error fetching root categories:", error);
       res.status(500).json({
         success: false,
         message: "Error al obtener categorías raíz",

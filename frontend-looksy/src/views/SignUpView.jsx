@@ -37,7 +37,6 @@ function SignUpView() {
             };
 
             const response = await apiAxios.post('/users', userData);
-            console.log(response.data);
             const { token, user: createdUser } = response.data;
             if (token) {
                 localStorage.setItem('token', token);
@@ -46,7 +45,6 @@ function SignUpView() {
             toast.success('¡Usuario creado exitosamente!');
             navigate('/');
         } catch (error) {
-            console.log(error);
             if (error.response && error.response.data) {
                 toast.error(`Error: ${error.response.data.message || 'No se pudo crear el usuario'}`);
             } else {

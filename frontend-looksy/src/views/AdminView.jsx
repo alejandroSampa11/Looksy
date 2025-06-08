@@ -59,7 +59,8 @@ function AdminView() {
         const transformedProducts = response.data.data.map(item => ({
           id: item._id,
           name: item.nombre,
-          category: getCategoryName(item.categoria),
+          category: item.categoria,
+          subcategoria: item.subcategoria,
           price: item.precio,
           stock: item.stock,
           description: item.descripcion || '',
@@ -67,7 +68,6 @@ function AdminView() {
           sales: item.sales || 0,
           rating: item.rating || 4.5
         }));
-        console.log(response.data.data[0].imageUrl);
         setProducts(transformedProducts);
       }
     } catch (e) {

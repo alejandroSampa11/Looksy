@@ -19,6 +19,10 @@ function CategoryView() {
     // Add more mappings as needed
   };
 
+  const handleProductClick = (productId) => {
+    navigate(`/item/${productId}`);
+  };
+
   const getBannerImage = () => {
     if (category?.banner) {
       return category.banner;
@@ -47,7 +51,7 @@ function CategoryView() {
         setLoading(false);
       }
     };
-    
+
     const fetchCategory = async () => {
       try {
         setLoading(true);
@@ -68,6 +72,7 @@ function CategoryView() {
           setLoading(true);
           const categoryData = await fetchCategory();
           await fetchProducts(categoryData);
+          // eslint-disable-next-line no-unused-vars
         } catch (err) {
           setLoading(false);
         }
@@ -180,6 +185,7 @@ function CategoryView() {
               {products.map((product) => (
                 <Grid item key={product._id} xs={12} sm={6} md={4} lg={3}>
                   <CardItem
+                    onClick={() => handleProductClick(product._id)}
                     imagen={product.imageUrl}
                     nombre={product.nombre}
                     precio={product.precio}

@@ -250,12 +250,18 @@ const getAllItemsLimit50 = async (
   res: Response
 ): Promise<void> => {
   try {
+    const { filterString } = req.body;
     const page = parseInt(req.params.page, 10) || 1;
     const limit = 10;
     const skip = (page - 1) * limit;
 
+    let query = {};
+    if (filterString && filterString.length > 0) {
+      query = { nombre: { $regex: filterString, $options: 'i' } }
+    }
+
     const [items, total] = await Promise.all([
-      Item.find().sort({ createdAt: 1 }).skip(skip).limit(limit),
+      Item.find(query).sort({ createdAt: 1 }).skip(skip).limit(limit),
       Item.countDocuments()
     ]);
 
@@ -791,12 +797,28 @@ const updateStock = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const searchItem = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { filterString } = req.body;
+
+    const items = await Item.find({
+      nombre: { $regex: filterString, $options: 'i' }
+    });
+
+    res.status(200).json({ data: items });
+  } catch (error: any) {
+    res.status(500).json({ message: 'Error al buscar el item', error: error.message });
+  }
+}
+
+
 export {
   createItem,
   obtenerItemConSimilares,
   getItemById,
   getItemsByCategory,
   getAllItemsLimit50,
+  searchItem,
   getAllItems,
   updateItem,
   deleteItem,

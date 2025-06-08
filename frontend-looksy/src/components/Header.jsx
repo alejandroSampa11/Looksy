@@ -35,8 +35,12 @@ import {
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { useSelector, useDispatch } from 'react-redux';
+import { setSearchFilter } from '../redux/slices/filterSlice'
 
 function Header({ onMenuClick, cartItemCount = 0 }) {
+    const dispatch = useDispatch();
+     const { userInfo, isAdmin } = useSelector(state => state.user);
     const theme = useTheme()
     const isMobile = useMediaQuery(theme.breakpoints.down('md'))
     const { user, isAuthenticated } = useAuth();
@@ -62,9 +66,9 @@ function Header({ onMenuClick, cartItemCount = 0 }) {
         handleProfileMenuClose();
     }
 
-    const handleSearch = () => {
+    const handleSearch = async () => {
         if (searchValue.trim()) {
-            console.log('Searching for:', searchValue)
+            dispatch(setSearchFilter(searchValue.trim()))
         }
     }
 
@@ -207,7 +211,11 @@ function Header({ onMenuClick, cartItemCount = 0 }) {
                             placeholder="Search products, brands, categories..."
                             variant="outlined"
                             value={searchValue}
-                            onChange={(e) => setSearchValue(e.target.value)}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                setSearchValue(value);
+                                dispatch(setSearchFilter(value.trim()))
+                            }}
                             onKeyPress={handleSearchKeyPress}
                             InputProps={{
                                 startAdornment: (
@@ -234,26 +242,6 @@ function Header({ onMenuClick, cartItemCount = 0 }) {
                                 }
                             }}
                         />
-                        <Button
-                            variant="contained"
-                            onClick={handleSearch}
-                            sx={{
-                                ml: 1,
-                                backgroundColor: '#673430',
-                                borderRadius: 2,
-                                px: 3,
-                                py: 1,
-                                fontWeight: 'bold',
-                                transition: 'all 0.2s ease-in-out',
-                                '&:hover': {
-                                    backgroundColor: '#4a2521',
-                                    transform: 'translateY(-1px)',
-                                    boxShadow: 3
-                                }
-                            }}
-                        >
-                            Search
-                        </Button>
                     </Box>
 
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

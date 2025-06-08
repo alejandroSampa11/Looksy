@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Box,
     Typography,
@@ -10,6 +10,7 @@ import {
     Divider,
     IconButton,
     Chip,
+    Collapse,
 } from '@mui/material'
 import {
     ArrowBackIos as ArrowBackIosIcon,
@@ -26,27 +27,32 @@ import {
 } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import apiAxios from '../config/cienteAxios'
+import CategoryList from './CategoryList'
 const drawerWidth = 320
-
-const menuItems = [
-    { id: 1, text: "Home", path: "/", icon: <HomeIcon /> },
-    { id: 2, text: "Rings", path: "/rings", icon: <RingIcon /> },
-    { id: 3, text: "Necklaces", path: "/necklaces", icon: <NecklaceIcon /> },
-    { id: 4, text: "Earrings", path: "/earrings", icon: <EarringIcon /> },
-    { id: 5, text: "Watches", path: "/watches", icon: <WatchIcon /> },
-    { id: 6, text: "Bracelets", path: "/bracelets", icon: <BraceletIcon /> },
-    { id: 7, text: "New Arrivals", path: "/new-arrivals", icon: <NewArrivalsIcon />, isNew: true }
-]
 
 function DrawerSide({ onMenuClick, isDrawerOpen }) {
     const navigate = useNavigate()
-    const {user, isAuthenticated, hasRole} = useAuth();
+    const { user, isAuthenticated, hasRole } = useAuth();
+    const [categories, setCategories] = useState([])
 
     const handleNavigation = (path) => {
         navigate(path)
         onMenuClick()
     }
 
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await apiAxios.get('/category/tree');
+                const data = response.data.data;s
+                setCategories(data);
+            } catch (error) {
+                console.error('Failed to load categories:', error);
+            }
+        }
+        fetchCategories()
+    }, [])
 
     return (
         <Drawer
@@ -157,62 +163,7 @@ function DrawerSide({ onMenuClick, isDrawerOpen }) {
                 >
                     CATEGORIES
                 </Typography>
-                <List sx={{ px: 1 }}>
-                    {menuItems.map((item) => (
-                        <ListItem
-                            button
-                            key={item.id}
-                            onClick={() => handleNavigation(item.path)}
-                            sx={{
-                                borderRadius: 2,
-                                mb: 0.5,
-                                mx: 1,
-                                transition: 'all 0.2s ease-in-out',
-                                '&:hover': {
-                                    backgroundColor: 'rgba(103, 52, 48, 0.08)',
-                                    transform: 'translateX(8px)',
-                                    boxShadow: '2px 2px 8px rgba(103, 52, 48, 0.1)'
-                                },
-                                '&:active': {
-                                    transform: 'translateX(4px) scale(0.98)'
-                                }
-                            }}
-                        >
-                            <ListItemIcon
-                                sx={{
-                                    color: '#673430',
-                                    minWidth: 40,
-                                    transition: 'color 0.2s ease-in-out'
-                                }}
-                            >
-                                {item.icon}
-                            </ListItemIcon>
-                            <ListItemText
-                                primary={item.text}
-                                sx={{
-                                    '& .MuiListItemText-primary': {
-                                        fontWeight: 500,
-                                        color: '#333'
-                                    }
-                                }}
-                            />
-                            {item.isNew && (
-                                <Chip
-                                    label="NEW"
-                                    size="small"
-                                    sx={{
-                                        backgroundColor: '#FFD700',
-                                        color: '#673430',
-                                        fontWeight: 'bold',
-                                        fontSize: '0.7rem',
-                                        height: 20
-                                    }}
-                                />
-                            )}
-                        </ListItem>
-                    ))}
-                </List>
-
+                <CategoryList categories={categories} handleNavigation={handleNavigation}/>
                 {hasRole('admin') && (
                     <>
                         <Divider sx={{ my: 2, mx: 2 }} />

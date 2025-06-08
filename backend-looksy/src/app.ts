@@ -40,7 +40,7 @@ const swaggerOptions = {
       }
     }
   },
-  apis: ['./src/routes/*.ts', './src/controllers/*.ts'], // ajusta si es necesario
+  apis: ['./src/routes/*.ts', './src/controllers/*.ts', './src/services/*.ts'], // ajusta si es necesario
 };
 
 

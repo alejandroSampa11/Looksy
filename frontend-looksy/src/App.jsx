@@ -19,6 +19,7 @@ import { ToastContainer } from 'react-toastify';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { setUser } from './redux/slices/userSlice';
+import CategoryView from './views/CategoryView';
 
 function App() {
   const dispatch = useDispatch();
@@ -60,12 +61,7 @@ function App() {
           {/* Rutas protegidas o con layout */}
           <Route element={<Layout />}>
             <Route path="/" element={<HomeView />} />
-            <Route path="/rings" element={<RingsView />} />
-            <Route path="/necklaces" element={<NecklaceView />} />
-            <Route path="/earrings" element={<EarringsView />} />
-            <Route path="/bracelets" element={<BraceletView />} />
-            <Route path="/watches" element={<WatchesView />} />
-            <Route path="/new-arrivals" element={<NewArrivalsView />} />
+            <Route path="/category/:categoryId" element={<CategoryView/>} />
           </Route>
 
           <Route element={<LayoutAdmin />}>

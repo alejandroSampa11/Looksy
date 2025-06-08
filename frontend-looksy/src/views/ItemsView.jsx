@@ -69,7 +69,7 @@ function ItemDetailView() {
     }
 
     const handleAddToCart = () => {
-        toast.success(`🛒 ${item.name} agregado al carrito`)
+        toast.success(`🛒 ${item.nombre} agregado al carrito`)
     }
 
     const handleGoBack = () => {
@@ -259,7 +259,7 @@ function ItemDetailView() {
                                             lineHeight: 1.2,
                                             textShadow: '2px 2px 4px rgba(0,0,0,0.1)'
                                         }}>
-                                            {item.name}
+                                            {item.nombre}
                                         </Typography>
 
                                         {/* Price */}

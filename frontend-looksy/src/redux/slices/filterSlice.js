@@ -6,7 +6,7 @@ const filterSlice = createSlice({
         searchFilter: '',
         minPrice: null,
         maxPrice: null,
-        sort: null
+        sort: null,
     },
     reducers: {
         setSearchFilter(state, action) {
@@ -20,7 +20,7 @@ const filterSlice = createSlice({
         },
         setSort(state, action) {
             state.sort = action.payload;
-        }
+        },
     }
 });
 

@@ -10,5 +10,6 @@ router.get('/:id/children', CategoryController.getChildren);
 router.put('/:id', CategoryController.update);
 router.delete('/:id', CategoryController.delete);
 router.get('/:id', CategoryController.getById);
+router.get('/:id/parent', CategoryController.getParent);
 
 export default router;

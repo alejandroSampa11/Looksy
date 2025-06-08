@@ -119,7 +119,7 @@ function EditProduct(props) {
                                         }}>
                                             <TableCell>
                                                 <Avatar
-                                                    src={product.imageUrl}
+                                                    src={product.imageUrl ? `http://localhost:3000${product.imageUrl}` : '/default-placeholder.jpg'}
                                                     variant="rounded"
                                                     sx={{
                                                         width: 60,

@@ -249,19 +249,29 @@ const getAllItemsLimit50 = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { filterString } = req.body;
+    const { filterString, minPrice, maxPrice, sort } = req.body;
     const page = parseInt(req.params.page, 10) || 1;
     const limit = 10;
     const skip = (page - 1) * limit;
 
-    let query = {};
+    let query: any = {};
     if (filterString && filterString.length > 0) {
-      query = { nombre: { $regex: filterString, $options: 'i' } }
+      query.nombre = { $regex: filterString, $options: 'i' };
     }
 
+    if (typeof minPrice === 'number' || typeof maxPrice === 'number') {
+      query.precio = {};
+      if (typeof minPrice === 'number') query.precio.$gte = minPrice;
+      if (typeof maxPrice === 'number') query.precio.$lte = maxPrice;
+    }
+
+    const validSort = sort === 1 || sort === -1;
     const [items, total] = await Promise.all([
-      Item.find(query).sort({ createdAt: 1 }).skip(skip).limit(limit),
-      Item.countDocuments()
+      Item.find(query)
+      .sort(validSort ? { precio: sort, _id: 1 } : { createdAt: 1, _id: 1 })
+      .skip(skip)
+      .limit(limit),
+      Item.countDocuments(query)
     ]);
 
     const totalPages = Math.ceil(total/limit);

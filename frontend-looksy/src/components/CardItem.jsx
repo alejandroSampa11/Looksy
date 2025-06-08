@@ -29,7 +29,7 @@ function CardItem({ imagen, nombre, precio }) {
                         objectFit: 'contain',
                         padding: 2,
                     }}
-                    src={`${imagen}`}
+                    src={`http://localhost:3000${imagen}`}
                     alt={`${imagen}`}
                 />
                 <Box sx={{ p: 2, width: '100%', display:'flex', justifyContent:'space-between' }}>

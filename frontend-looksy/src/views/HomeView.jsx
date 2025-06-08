@@ -1,84 +1,56 @@
+import React, { useState, useEffect } from 'react';
 import { Box, Typography } from '@mui/material'
 import CardItem from '../components/CardItem'
 import { useSelector } from 'react-redux';
+import LoadingSpinner from '../components/LoadingSpinner';
+import apiAxios from '../config/cienteAxios';
+import { Card } from '@mui/material';
 
-const products = [
-  {
-    id: 1,
-    title: "Golden Bracelet",
-    price: 59.99,
-    image: "bracelet.webp"  
-  },
-  {
-    id: 2,
-    title: "Silver Ring",
-    price: 45.99,
-    image: "bracelet.webp"  
-  },
-  {
-    id: 3,
-    title: "Pearl Necklace",
-    price: 89.99,
-    image: "bracelet.webp"  
-  },
-   {
-    id: 1,
-    title: "Golden Bracelet",
-    price: 59.99,
-    image: "bracelet.webp" 
-  },
-  {
-    id: 2,
-    title: "Silver Ring",
-    price: 45.99,
-    image: "bracelet.webp" 
-  },
-  {
-    id: 3,
-    title: "Pearl Necklace",
-    price: 89.99,
-    image: "bracelet.webp" 
-  },
-   {
-    id: 1,
-    title: "Golden Bracelet",
-    price: 59.99,
-    image: "bracelet.webp"
-  },
-  {
-    id: 2,
-    title: "Silver Ring",
-    price: 45.99,
-    image: "bracelet.webp"
-  },
-  {
-    id: 3,
-    title: "Pearl Necklace",
-    price: 89.99,
-    image: "bracelet.webp" 
-  },
-   {
-    id: 1,
-    title: "Golden Bracelet",
-    price: 59.99,
-    image: "bracelet.webp" 
-  },
-  {
-    id: 2,
-    title: "Silver Ring",
-    price: 45.99,
-    image: "bracelet.webp"
-  },
-  {
-    id: 3,
-    title: "Pearl Necklace",
-    price: 89.99,
-    image: "bracelet.webp" 
+async function fetchProducts(filterStr, page) {
+  try {
+    const response = await apiAxios.get(`/item/getItems/${page > 0 ? page : 1}`);
+    return response.data;
+  } catch (e) {
+    console.error('Error obteniendo productos en HomeView', e);
   }
-]
+}
 
 function HomeView() {
     const { userInfo, isAdmin } = useSelector(state => state.user);
+    const [isLoading, setIsLoading] = useState(true);
+    const [products, setProducts] = useState([])
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1)
+
+    useEffect(() => {
+      (async () => {
+        if (page <= totalPages) {
+          const productsResponse = await fetchProducts('', page);
+          setProducts(productsResponse.data);
+
+          setTotalPages(productsResponse.setTotalPages);
+        }
+        setIsLoading(false);
+      })()
+    }, [page])
+
+
+    if (isLoading) {
+        return (
+          <Card
+            sx={{
+              minHeight: '100vh',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: 'none',
+              borderRadius: 0,
+            }}
+          >
+            <LoadingSpinner />
+          </Card>
+        );
+      }
 
     return (
         <>
@@ -102,11 +74,8 @@ function HomeView() {
                 display: 'block',
                 marginTop: 6
             }}>
-                <Typography sx={{ color: '#000000', textAlign: 'center' }} variant="h3">
-                    Accessories
-                </Typography>
-                <Typography sx={{ color: '#000000', textAlign: 'center', marginTop: 1 }} variant="h5">
-                    From bags to jewelry—we've got the perfect accessories for every style.
+                <Typography sx={{ color: '#000000', textAlign: 'center' }} variant="h4">
+                    Worn Beautifully.
                 </Typography>
             </Box>
             <Box
@@ -122,9 +91,9 @@ function HomeView() {
                 {products.map((product) => (
                     <CardItem
                         key={product.id}
-                        imagen={product.image}
-                        nombre={product.title}
-                        precio={product.price}
+                        imagen={product.imageUrl}
+                        nombre={product.nombre}
+                        precio={product.precio}
                     />
                 ))}
             </Box>

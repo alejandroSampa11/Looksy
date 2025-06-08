@@ -20,6 +20,7 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { setUser } from './redux/slices/userSlice';
 import CategoryView from './views/CategoryView';
+import ItemDetailView from './views/ItemsView';
 
 function App() {
   const dispatch = useDispatch();
@@ -62,6 +63,7 @@ function App() {
           <Route element={<Layout />}>
             <Route path="/" element={<HomeView />} />
             <Route path="/category/:categoryId" element={<CategoryView/>} />
+            <Route path="/item/:id" element={<ItemDetailView/>} />
           </Route>
 
           <Route element={<LayoutAdmin />}>

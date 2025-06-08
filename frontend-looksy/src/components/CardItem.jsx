@@ -2,10 +2,15 @@ import { Box, Typography } from '@mui/material'
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import React from 'react'
 
-function CardItem({ imagen, nombre, precio }) {
+function CardItem({ imagen, nombre, precio, onClick}) {
+    const handleCartClick = (e) => {
+        e.stopPropagation();
+    };
+
     return (
         <>
             <Box
+                onClick={onClick}
                 sx={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -15,6 +20,7 @@ function CardItem({ imagen, nombre, precio }) {
                     borderRadius: 2,
                     boxShadow: 3,
                     overflow: 'hidden',
+                    cursor:'pointer',
                     transition: 'transform 0.3s ease-in-out',
                     '&:hover': {
                         transform: 'scale(1.05)',
@@ -30,7 +36,7 @@ function CardItem({ imagen, nombre, precio }) {
                         padding: 2,
                     }}
                     src={`http://localhost:3000${imagen}`}
-                    alt={`${imagen}`}
+                    alt={nombre}
                 />
                 <Box sx={{ p: 2, width: '100%', display:'flex', justifyContent:'space-between' }}>
                     <Box>
@@ -42,12 +48,20 @@ function CardItem({ imagen, nombre, precio }) {
                         </Typography>
                         <Typography
                             sx={{ color: '#000000' }}
-                            variant="h7"
+                            variant="h6"
                         >
                             {`$ ${precio} MX`}
                         </Typography>
                     </Box>
-                    <AddShoppingCartIcon sx={{fontSize: 30, color: '#673430', cursor: 'pointer', '&:hover': {opacity: 0.7}}}/>
+                    <AddShoppingCartIcon 
+                        onClick={handleCartClick}
+                        sx={{
+                            fontSize: 30, 
+                            color: '#673430', 
+                            cursor: 'pointer', 
+                            '&:hover': {opacity: 0.7}
+                        }}
+                    />
                 </Box>
             </Box>
         </>

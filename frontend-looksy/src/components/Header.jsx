@@ -259,21 +259,6 @@ function Header({ onMenuClick, cartItemCount = 0 }) {
                         </IconButton>
 
                         <IconButton
-                            sx={{
-                                color: '#673430',
-                                transition: 'all 0.2s ease-in-out',
-                                '&:hover': {
-                                    backgroundColor: 'rgba(103, 52, 48, 0.1)',
-                                    transform: 'scale(1.1)'
-                                }
-                            }}
-                        >
-                            <Badge badgeContent={cartItemCount} color="error">
-                                <ShoppingCartIcon sx={{ fontSize: 26 }} />
-                            </Badge>
-                        </IconButton>
-
-                        <IconButton
                             onClick={handleProfileMenuOpen}
                             sx={{
                                 color: '#673430',

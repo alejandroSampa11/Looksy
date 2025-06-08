@@ -5,6 +5,7 @@ import { connectDB } from "./config/db";
 import { errorHandler } from './middleware/errorHandler';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
+import path from "path";
 
 process.on('uncaughtException', (error) => {
   console.error('⚠️ Uncaught exception', error.message);
@@ -12,6 +13,7 @@ process.on('uncaughtException', (error) => {
 })
 
 const app = express();
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 const swaggerOptions = {
   definition: {

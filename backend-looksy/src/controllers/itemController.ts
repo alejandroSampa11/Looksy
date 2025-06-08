@@ -158,11 +158,12 @@ const obtenerItemConSimilares = async (req: Request, res: Response) => {
  * @swagger
  * /api/item:
  *   get:
- *     summary: Obtener hasta 50 artículos sin filtrar por categoría
+ *     summary: Get all items with a limit of 50
+ *     description: Retrieve a list of all items from the database with a maximum limit of 50 items
  *     tags: [Items]
  *     responses:
  *       200:
- *         description: Lista de artículos (máximo 50)
+ *         description: Items retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -170,13 +171,58 @@ const obtenerItemConSimilares = async (req: Request, res: Response) => {
  *               properties:
  *                 success:
  *                   type: boolean
+ *                   example: true
  *                 data:
  *                   type: array
  *                   maxItems: 50
  *                   items:
- *                     $ref: '#/components/schemas/Item'
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         example: 60d21b4667d0d8992e610c85
+ *                       nombre:
+ *                         type: string
+ *                         example: Smartphone Samsung Galaxy
+ *                       categoria:
+ *                         type: integer
+ *                         example: 1
+ *                       precio:
+ *                         type: number
+ *                         example: 299.99
+ *                       stock:
+ *                         type: integer
+ *                         example: 50
+ *                       descripcion:
+ *                         type: string
+ *                         example: Latest smartphone with advanced features
+ *                       imageUrl:
+ *                         type: string
+ *                         example: /uploads/image-1234567890.jpg
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: 2023-06-22T10:30:40.000Z
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: 2023-06-22T10:30:40.000Z
  *       500:
- *         description: Error del servidor
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Error del servidor
+ *                 error:
+ *                   type: string
+ *                   example: Error message details
  */
 const getAllItemsLimit50 = async (
   req: Request,
@@ -206,13 +252,13 @@ const getAllItemsLimit50 = async (
  * @swagger
  * /api/item:
  *   post:
- *     summary: Create a new item
- *     tags:
- *       - Items
+ *     summary: Create a new item with image upload
+ *     description: Create a new item with all required fields and an image file
+ *     tags: [Items]
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -221,33 +267,114 @@ const getAllItemsLimit50 = async (
  *               - precio
  *               - stock
  *               - descripcion
- *               - urlImage
+ *               - image
  *             properties:
  *               nombre:
  *                 type: string
+ *                 description: Product name
+ *                 example: "Smartphone Samsung Galaxy"
  *               categoria:
- *                 type: number
+ *                 type: integer
+ *                 description: Category ID (numeric)
+ *                 example: 1
  *               precio:
  *                 type: number
+ *                 format: float
+ *                 description: Product price
+ *                 example: 299.99
  *               stock:
- *                 type: number
+ *                 type: integer
+ *                 description: Available quantity in inventory
+ *                 example: 50
  *               descripcion:
  *                 type: string
- *               urlImage:
+ *                 description: Detailed product description
+ *                 example: "Latest smartphone with advanced features"
+ *               image:
  *                 type: string
+ *                 format: binary
+ *                 description: Product image file (JPEG, PNG, etc.)
  *     responses:
  *       201:
  *         description: Item created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Item created successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: 60d21b4667d0d8992e610c85
+ *                     nombre:
+ *                       type: string
+ *                       example: Smartphone Samsung Galaxy
+ *                     categoria:
+ *                       type: integer
+ *                       example: 1
+ *                     precio:
+ *                       type: number
+ *                       example: 299.99
+ *                     stock:
+ *                       type: integer
+ *                       example: 50
+ *                     descripcion:
+ *                       type: string
+ *                       example: Latest smartphone with advanced features
+ *                     imageUrl:
+ *                       type: string
+ *                       example: /uploads/image-1234567890.jpg
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: 2023-06-22T10:30:40.000Z
  *       400:
- *         description: Missing fields
+ *         description: Missing required fields or validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Datos incompletos. Campos requeridos faltantes
+ *                 missingFields:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Nombre del Producto", "Imagen"]
  *       500:
  *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Failed to create item
+ *                 error:
+ *                   type: string
+ *                   example: Error message details
  */
 
 const createItem = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { nombre, categoria, precio, stock, descripcion, urlImage } =
-      req.body;
+    const { nombre, categoria, precio, stock, descripcion } = req.body;
     const missingFields = [];
 
     if (!nombre) missingFields.push("Nombre del Producto");
@@ -255,7 +382,7 @@ const createItem = async (req: Request, res: Response): Promise<void> => {
     if (!precio) missingFields.push("Precio");
     if (!stock) missingFields.push("Stock");
     if (!descripcion) missingFields.push("Descripción");
-    if (!urlImage) missingFields.push("Imagen");
+    if (!req.file) missingFields.push("Imagen");
 
     if (missingFields.length > 0) {
       res.status(400).json({
@@ -266,9 +393,23 @@ const createItem = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const item = new Item(req.body);
+    const imageUrl = `/uploads/${req.file.filename}`; // ruta pública o relativa de la imagen
+
+    const item = new Item({
+      nombre,
+      categoria,
+      precio,
+      stock,
+      descripcion,
+      imageUrl,
+    });
+
     await item.save();
-    res.status(201).json({ message: "Item created successfully" });
+    res.status(201).json({
+      success: true,
+      message: "Item created successfully",
+      data: item,
+    });
   } catch (error) {
     console.error("Error creating item:", error);
     res.status(500).json({
@@ -278,6 +419,7 @@ const createItem = async (req: Request, res: Response): Promise<void> => {
     });
   }
 };
+
 //#endregion
 
 /**
@@ -392,7 +534,6 @@ const updateItem = async (req: Request, res: Response): Promise<void> => {
       message: "Item updated successfully",
       data: updatedItem,
     });
-
   } catch (error) {
     console.error("Error updating item:", error);
     res.status(500).json({
@@ -487,7 +628,7 @@ const deleteItem = async (req: Request, res: Response): Promise<void> => {
     if (!id) {
       res.status(400).json({
         success: false,
-        message: "ID del Producto requerido"
+        message: "ID del Producto requerido",
       });
       return;
     }
@@ -497,22 +638,21 @@ const deleteItem = async (req: Request, res: Response): Promise<void> => {
     if (!deletedItem) {
       res.status(404).json({
         success: false,
-        message: "Item not found"
+        message: "Item not found",
       });
       return;
     }
 
     res.status(200).json({
       success: true,
-      message: "Item deleted successfully"
+      message: "Item deleted successfully",
     });
-
   } catch (error) {
     console.error("Error deleting item:", error);
     res.status(500).json({
       success: false,
       message: "Failed to delete item",
-      error: error instanceof Error ? error.message : "Unknown error"
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
@@ -565,19 +705,21 @@ const updateStock = async (req: Request, res: Response): Promise<void> => {
 
     const missingFields = [];
     if (!id) {
-      missingFields.push('Item id');
+      missingFields.push("Item id");
     }
     if (!stock) {
-      missingFields.push('Stock');
+      missingFields.push("Stock");
     }
 
     if (missingFields.length > 0) {
-      res.status(400).json({ message: `Missing fields: ${missingFields.join(', ')}` })
+      res
+        .status(400)
+        .json({ message: `Missing fields: ${missingFields.join(", ")}` });
       return;
     }
 
-    if (typeof stock !== 'number' || stock < 0) {
-      res.status(400).json({ message: 'Stock must be a positive number' });
+    if (typeof stock !== "number" || stock < 0) {
+      res.status(400).json({ message: "Stock must be a positive number" });
       return;
     }
 
@@ -587,7 +729,7 @@ const updateStock = async (req: Request, res: Response): Promise<void> => {
       { new: true, runValidators: true }
     );
     if (!updateItem) {
-      res.status(404).json({ message: 'Item not found' });
+      res.status(404).json({ message: "Item not found" });
       return;
     }
 
@@ -595,24 +737,26 @@ const updateStock = async (req: Request, res: Response): Promise<void> => {
       item: id,
       user: userId,
       stock,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     });
 
     res.status(200).json({
       success: true,
-      message: 'Stock updated successfully',
-      data: updatedItem
+      message: "Stock updated successfully",
+      data: updatedItem,
     });
 
     res.status(200).json({
       success: true,
-      message: 'Stock updated succesfully',
-      data: updateItem
+      message: "Stock updated succesfully",
+      data: updateItem,
     });
   } catch (error: any) {
-    res.status(500).json({ message: 'Error al actualizar el stock', error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error al actualizar el stock", error: error.message });
   }
-}
+};
 
 export {
   createItem,
@@ -622,5 +766,5 @@ export {
   getAllItemsLimit50,
   updateItem,
   deleteItem,
-  updateStock
+  updateStock,
 };

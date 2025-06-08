@@ -63,7 +63,7 @@ function AdminView() {
           price: item.precio,
           stock: item.stock,
           description: item.descripcion || '',
-          imageUrl: item.urlImage || '',
+          imageUrl: item.imageUrl || '',
           sales: item.sales || 0,
           rating: item.rating || 4.5
         }));

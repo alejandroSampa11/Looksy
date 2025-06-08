@@ -3,48 +3,57 @@ import { toast } from 'react-toastify';
 import apiAxios from '../../config/cienteAxios';
 import AddIcon from '@mui/icons-material/Add';
 import {
-  Box,
-  Typography,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Grid,
-  Avatar,
-  Card,
-  CardContent,
-  Divider,
-  Stack,
-  TextField,
-  Button
+    Box,
+    Typography,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
+    Grid,
+    Avatar,
+    Card,
+    CardContent,
+    Divider,
+    Stack,
+    TextField,
+    Button
 } from '@mui/material';
 
 function AddProduct(props) {
-    const {resetForm, formData, handleInputChange, categoryOptions, getCategoryNumber, getCategoryIcon} = props;
+    const { resetForm, formData, handleInputChange, categoryOptions, getCategoryNumber, getCategoryIcon } = props;
 
     const handleCreateProduct = async (e) => {
         e.preventDefault();
         try {
-            const itemData = {
-                nombre: formData.name,
-                categoria: getCategoryNumber(formData.category),
-                precio: parseFloat(formData.price),
-                stock: parseInt(formData.stock),
-                descripcion: formData.description,
-                urlImage: formData.imageUrl
-            };
+            const form = new FormData();
+            form.append('nombre', formData.name);
+            form.append('categoria', getCategoryNumber(formData.category));
+            form.append('precio', parseFloat(formData.price));
+            form.append('stock', parseInt(formData.stock));
+            form.append('descripcion', formData.description);
+            form.append('image', formData.imageUrl);
 
-            const response = await apiAxios.post('/item', itemData);
-            const result = response.data;
+            const response = await apiAxios.post('/item', form, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
 
             if (response.status !== 201) {
-                throw new Error(result.message || 'Error al crear el producto');
+                throw new Error(response.data.message || 'Error al crear el producto');
             }
 
             resetForm();
             toast.success('Producto creado exitosamente!');
         } catch (error) {
             toast.error(`Error al crear el producto: ${error.message}`);
+        }
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            handleInputChange({ target: { name: 'imageUrl', value: file } });
         }
     };
 
@@ -232,39 +241,59 @@ function AddProduct(props) {
                             }}
                         />
                         <FormControl fullWidth>
-                            <Box display={'flex'} flexDirection={'row'} alignItems={'center'}>
-                                <TextField
-                                    fullWidth
-                                    label="Image URL"
-                                    name="imageUrl"
-                                    value={formData.imageUrl}
-                                    onChange={handleInputChange}
-                                    variant="outlined"
-                                    placeholder="/api/placeholder/150/150"
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            borderRadius: 2,
-                                            '&:hover': {
-                                                boxShadow: '0 4px 12px rgba(103, 52, 48, 0.15)'
+                            <Box display="flex" flexDirection="row" alignItems="center" gap={2}>
+                                <Box flex={1} display="flex" gap={1}>
+                                    <TextField
+                                        fullWidth
+                                        label="Image File"
+                                        name="imageUrl"
+                                        value={formData.imageUrl?.name || ''}
+                                        disabled
+                                        variant="outlined"
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                borderRadius: 2,
                                             },
-                                            '&.Mui-focused': {
-                                                '& .MuiOutlinedInput-notchedOutline': {
-                                                    borderColor: '#673430'
-                                                }
+                                            '& .MuiInputLabel-root.Mui-disabled': {
+                                                color: '#673430'
                                             }
-                                        },
-                                        '& .MuiInputLabel-root.Mui-focused': {
-                                            color: '#673430'
-                                        }
-                                    }}
-                                />
-                                <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+                                        }}
+                                    />
+                                    <Button
+                                        variant="outlined"
+                                        component="label"
+                                        sx={{
+                                            whiteSpace: 'nowrap',
+                                            borderRadius: 2,
+                                            color: '#673430',
+                                            borderColor: '#673430',
+                                            '&:hover': {
+                                                backgroundColor: 'rgba(103, 52, 48, 0.08)',
+                                                borderColor: '#673430'
+                                            }
+                                        }}
+                                    >
+                                        Choose File
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            hidden
+                                            onChange={handleFileChange}
+                                        />
+                                    </Button>
+                                </Box>
+
+                                <Box mt={3} display="flex" justifyContent="center">
                                     <Avatar
-                                        src={formData.imageUrl}
+                                        src={
+                                            formData.imageUrl
+                                                ? URL.createObjectURL(formData.imageUrl)
+                                                : ''
+                                        }
                                         variant="rounded"
                                         sx={{
-                                            width: 80,
-                                            height: 80,
+                                            width: 100,
+                                            height: 100,
                                             boxShadow: '0 8px 32px rgba(103, 52, 48, 0.25)',
                                             border: '4px solid white'
                                         }}

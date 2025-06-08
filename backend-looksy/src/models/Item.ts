@@ -6,7 +6,7 @@ export interface IItem extends Document {
   precio: number;
   stock: number;
   descripcion: string;
-  urlImage: string;
+  imageUrl: string;
   sales: number;
   rating: number;
 }
@@ -32,7 +32,7 @@ const itemSchema: Schema<IItem> = new Schema({
     type: String,
     required: true,
   },
-  urlImage: {
+  imageUrl: {
     type: String,
     required: true,
   },

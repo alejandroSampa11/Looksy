@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography } from '@mui/material'
+import { Box, Typography, Card, Pagination  } from '@mui/material'
 import CardItem from '../components/CardItem'
 import { useSelector } from 'react-redux';
 import LoadingSpinner from '../components/LoadingSpinner';
 import apiAxios from '../config/cienteAxios';
-import { Card } from '@mui/material';
 
 async function fetchProducts(filterStr, page) {
   try {
@@ -27,13 +26,11 @@ function HomeView() {
         if (page <= totalPages) {
           const productsResponse = await fetchProducts('', page);
           setProducts(productsResponse.data);
-
-          setTotalPages(productsResponse.setTotalPages);
+          setTotalPages(productsResponse.totalPages);
         }
         setIsLoading(false);
       })()
     }, [page])
-
 
     if (isLoading) {
         return (
@@ -96,6 +93,15 @@ function HomeView() {
                         precio={product.precio}
                     />
                 ))}
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6, mb: 6 }}>
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={(_, value) => setPage(value)}
+                color='#FFF'
+                size='large'
+              />
             </Box>
         </>
     )

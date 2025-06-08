@@ -251,7 +251,7 @@ const getAllItemsLimit50 = async (
 ): Promise<void> => {
   try {
     const page = parseInt(req.params.page, 10) || 1;
-    const limit = 50;
+    const limit = 10;
     const skip = (page - 1) * limit;
 
     const [items, total] = await Promise.all([

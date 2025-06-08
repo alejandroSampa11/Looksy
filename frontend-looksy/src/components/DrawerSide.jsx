@@ -45,7 +45,7 @@ function DrawerSide({ onMenuClick, isDrawerOpen }) {
         const fetchCategories = async () => {
             try {
                 const response = await apiAxios.get('/category/tree');
-                const data = response.data.data;s
+                const data = response.data.data;
                 setCategories(data);
             } catch (error) {
                 console.error('Failed to load categories:', error);

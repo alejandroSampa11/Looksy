@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Card, Pagination  } from '@mui/material'
 import CardItem from '../components/CardItem'
-import { useSelector } from 'react-redux';
 import LoadingSpinner from '../components/LoadingSpinner';
 import apiAxios from '../config/cienteAxios';
+import { setProducts, setTotalPages } from '../redux/slices/productSlice';
+import { useSelector, useDispatch } from 'react-redux';
 
-async function fetchProducts(filterStr, page) {
+export async function fetchProducts(filterStr, page) {
   try {
-    const response = await apiAxios.get(`/item/getItems/${page > 0 ? page : 1}`);
+    const response = await apiAxios.post(`/item/getItems/${page > 0 ? page : 1}`, {filterString: filterStr});
     return response.data;
   } catch (e) {
     console.error('Error obteniendo productos en HomeView', e);
@@ -15,22 +16,23 @@ async function fetchProducts(filterStr, page) {
 }
 
 function HomeView() {
+    const dispatch = useDispatch();
     const { userInfo, isAdmin } = useSelector(state => state.user);
+    const { searchFilter } = useSelector(state => state.searchFilter);
+    const { items: products, totalPages } = useSelector(state => state.products);
     const [isLoading, setIsLoading] = useState(true);
-    const [products, setProducts] = useState([])
     const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1)
 
     useEffect(() => {
       (async () => {
         if (page <= totalPages) {
-          const productsResponse = await fetchProducts('', page);
-          setProducts(productsResponse.data);
-          setTotalPages(productsResponse.totalPages);
+          const productsResponse = await fetchProducts(searchFilter, page);
+          dispatch(setProducts(productsResponse.data));
+          dispatch(setTotalPages(productsResponse.totalPages));
         }
         setIsLoading(false);
       })()
-    }, [page])
+    }, [page, searchFilter, dispatch])
 
     if (isLoading) {
         return (

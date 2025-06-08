@@ -31,8 +31,7 @@ function HomeView() {
   const { items: products, totalPages } = useSelector(state => state.products);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
-  console.log(products)
-
+  
   useEffect(() => {
     (async () => {
       if (page <= totalPages) {

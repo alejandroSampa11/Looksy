@@ -5,10 +5,15 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import apiAxios from '../config/cienteAxios';
 import { setProducts, setTotalPages } from '../redux/slices/productSlice';
 import { useSelector, useDispatch } from 'react-redux';
+import Filter from '../components/Filter';
 
-export async function fetchProducts(filterStr, page) {
+export async function fetchProducts(filterStr, page, sortQ) {
   try {
-    const response = await apiAxios.post(`/item/getItems/${page > 0 ? page : 1}`, {filterString: filterStr});
+    const response = await apiAxios.post(`/item/getItems/${page > 0 ? page : 1}`,
+      {
+        filterString: filterStr,
+        sort: sortQ
+      });
     return response.data;
   } catch (e) {
     console.error('Error obteniendo productos en HomeView', e);
@@ -18,7 +23,7 @@ export async function fetchProducts(filterStr, page) {
 function HomeView() {
     const dispatch = useDispatch();
     const { userInfo, isAdmin } = useSelector(state => state.user);
-    const { searchFilter } = useSelector(state => state.searchFilter);
+    const { searchFilter, sort } = useSelector(state => state.searchFilter);
     const { items: products, totalPages } = useSelector(state => state.products);
     const [isLoading, setIsLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -26,13 +31,13 @@ function HomeView() {
     useEffect(() => {
       (async () => {
         if (page <= totalPages) {
-          const productsResponse = await fetchProducts(searchFilter, page);
+          const productsResponse = await fetchProducts(searchFilter, page, sort);
           dispatch(setProducts(productsResponse.data));
           dispatch(setTotalPages(productsResponse.totalPages));
         }
         setIsLoading(false);
       })()
-    }, [page, searchFilter, dispatch])
+    }, [page, sort, searchFilter, dispatch])
 
     if (isLoading) {
         return (
@@ -73,6 +78,7 @@ function HomeView() {
                 display: 'block',
                 marginTop: 6
             }}>
+                <Filter/>
                 <Typography sx={{ color: '#000000', textAlign: 'center' }} variant="h4">
                     Worn Beautifully.
                 </Typography>

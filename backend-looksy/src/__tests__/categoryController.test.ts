@@ -63,6 +63,8 @@ describe("CategoryController", () => {
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         data: roots,
+        message: "Categorías raíz encontradas exitosamente",
+        count: roots.length,
       });
     });
 

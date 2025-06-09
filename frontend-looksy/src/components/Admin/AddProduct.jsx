@@ -106,7 +106,6 @@ function AddProduct(props) {
     };
 
     const getCategoryIcon = (categoryName) => {
-        console.log('categoryName', categoryName);
         const icons = {
             'Jewelry': '💎',
             'Aretes': '👂',

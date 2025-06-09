@@ -38,6 +38,7 @@ function AddCategory() {
                 const response = await apiAxios.get('/category/roots');
                 const data = response.data.data || response.data;
                 setParentCategories(data);
+            // eslint-disable-next-line no-unused-vars
             } catch (error) {
                 toast.error('Error al cargar las categorías principales');
                 setParentCategories([]);

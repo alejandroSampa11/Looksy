@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Clean out old containers and images
         run: |
-          docker-compose down --remove-orphans || true
+          docker compose down --remove-orphans || true
           docker image rm front:fs1 back:fs1 || true
 
       - name: Checkout code
@@ -23,7 +23,7 @@ jobs:
 
       - name: Build Docker images
         run: |
-          docker-compose build
+          docker compose build
 
       - name: Deploy containers
         env:
@@ -33,4 +33,4 @@ jobs:
           PORT: ${{ secrets.PORT }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: |
-          docker-compose up -d
+          docker compose up -d

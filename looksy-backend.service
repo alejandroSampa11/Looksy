@@ -1,0 +1,29 @@
+[Unit]
+Description=Looksy Backend Service
+After=network.target mongod.service
+Wants=mongod.service
+
+[Service]
+Type=simple
+User=looksy
+Group=looksy
+WorkingDirectory=/opt/looksy/backend-looksy
+Environment=NODE_ENV=production
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+ExecStartPre=/bin/bash -c 'cd /opt/looksy/backend-looksy && npm install'
+ExecStartPre=/bin/bash -c 'cd /opt/looksy/backend-looksy && npm run build'
+ExecStart=/usr/local/bin/node dist/app.js
+Restart=always
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=looksy-backend
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/looksy/backend-looksy/uploads
+
+[Install]
+WantedBy=multi-user.target

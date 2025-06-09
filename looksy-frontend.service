@@ -1,0 +1,29 @@
+[Unit]
+Description=Looksy Frontend Service
+After=network.target looksy-backend.service
+Wants=looksy-backend.service
+
+[Service]
+Type=simple
+User=looksy
+Group=looksy
+WorkingDirectory=/opt/looksy/frontend-looksy
+Environment=NODE_ENV=production
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+ExecStartPre=/bin/bash -c 'cd /opt/looksy/frontend-looksy && npm install'
+ExecStartPre=/bin/bash -c 'cd /opt/looksy/frontend-looksy && npm run build'
+ExecStart=/usr/local/bin/npm run preview
+Restart=always
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=looksy-frontend
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/looksy/frontend-looksy/dist
+
+[Install]
+WantedBy=multi-user.target

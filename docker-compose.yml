@@ -27,5 +27,3 @@ services:
       - NODE_ENV=production
       - VITE_BACKEND_API=http://sampablo.teclaguna.systems:3000/api
       - VITE_IMAGEN=http://sampablo.teclaguna.systems:3000
-    depends_on:
-      - back_fs1

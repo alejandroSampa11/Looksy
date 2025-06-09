@@ -1,4 +1,4 @@
-import { Box, Typography, Button, IconButton, Chip, Grid, Card, CardContent, Fade, Zoom, Badge } from "@mui/material"
+import { Box, Typography, Button, IconButton, Chip, Grid, Card, CardContent, Fade, Zoom, Badge, CardMedia, CardActions } from "@mui/material"
 import { useEffect, useState } from "react"
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
@@ -9,6 +9,7 @@ import InventoryIcon from '@mui/icons-material/Inventory'
 import { useNavigate, useParams } from "react-router-dom"
 import { toast } from 'react-toastify'
 import apiAxios from "../config/cienteAxios"
+import CardItem from "../components/CardItem"
 
 function ItemDetailView() {
     const navigate = useNavigate()
@@ -18,6 +19,7 @@ function ItemDetailView() {
     const [isFavorite, setIsFavorite] = useState(false)
     const [categories, setCategories] = useState({})
     const [imageLoaded, setImageLoaded] = useState(false)
+    const [relatedItems, setRelatedItems] = useState([])
 
     useEffect(() => {
         const fetchItem = async () => {
@@ -25,6 +27,9 @@ function ItemDetailView() {
                 setIsLoading(true)
                 const response = await apiAxios.get(`/item/${id}`)
                 setItem(response.data.data)
+                if (response.data.data.categoria) {
+                    fetchRelatedItems(response.data.data.categoria)
+                }
             // eslint-disable-next-line no-unused-vars
             } catch (error) {
                 toast.error('Error al cargar el producto')
@@ -51,13 +56,33 @@ function ItemDetailView() {
         }
     };
 
-    const getCategoryName = (categoryId) => {
-        return categories[categoryId] || 'Unknown Category';
-    };
-
     useEffect(() => {
         fetchCategories();
     }, []);
+
+    const handleProductClick = (productId) => {
+        navigate(`/item/${productId}`)
+    }
+
+    const fetchRelatedItems = async (categoryId) => {
+        try {
+            const response = await apiAxios.get(`/item/category/${categoryId}`)
+            const filtered = response.data.data.filter(relatedItem => relatedItem._id !== id)
+            const shuffled = filtered.sort(() => 0.5 - Math.random())
+        
+        setRelatedItems(shuffled.slice(0, 5))
+        } catch (error) {
+            console.error('Error fetching related items:', error)
+            toast.error('Error al cargar productos relacionados')
+        }
+    }
+
+    const getCategoryName = (category) => {
+        if (category && category.nombre) {
+            return category.nombre;
+        }
+        return categories[category] || 'Categoría general';
+    };
 
     const toggleFavorite = () => {
         setIsFavorite(!isFavorite)
@@ -159,7 +184,7 @@ function ItemDetailView() {
                         border: '1px solid rgba(255, 255, 255, 0.2)',
                         width: '100%'
                     }}>
-                        <Box sx={{ 
+                        <Box sx={{
                             display: 'flex',
                             flexDirection: { xs: 'column', md: 'row' },
                             height: '100%'
@@ -179,7 +204,7 @@ function ItemDetailView() {
                                     <Box
                                         component="img"
                                         src={item.imageUrl ? `http://localhost:3000${item.imageUrl}` : '/placeholder-image.jpg'}
-                                        alt={item.name}
+                                        alt={item.nombre}
                                         onLoad={() => setImageLoaded(true)}
                                         sx={{
                                             maxWidth: '90%',
@@ -234,7 +259,7 @@ function ItemDetailView() {
                                         {item.categoria && (
                                             <Chip
                                                 icon={<LocalOfferIcon />}
-                                                label={getCategoryName(item.category)}
+                                                label={getCategoryName(item.categoria)}
                                                 sx={{
                                                     background: 'linear-gradient(45deg, #673430, #8B4513)',
                                                     color: 'white',
@@ -272,7 +297,7 @@ function ItemDetailView() {
                                                 fontWeight: 'bold',
                                                 fontSize: { xs: '2rem', md: '2.5rem' }
                                             }}>
-                                                ${item.precio}
+                                                ${item.precio} MX
                                             </Typography>
                                         </Box>
 
@@ -352,6 +377,49 @@ function ItemDetailView() {
                             </Box>
                         </Box>
                     </Card>
+
+                    {relatedItems.length > 0 && (
+                        <Box sx={{
+                            width: '100%',
+                            maxWidth: '100%',
+                            margin: '32px 0 0 0',
+                            padding: 0,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center'
+                        }}>
+                            <Typography variant="h4" sx={{
+                                color: '#673430',
+                                fontWeight: 'bold',
+                                mb: 3,
+                                textAlign: 'center',
+                                fontSize: { xs: '1.8rem', md: '2.2rem' }
+                            }}>
+                                Productos Relacionados
+                            </Typography>
+
+                            <Grid container spacing={3} sx={{
+                                width: '100%',
+                                margin: 0,
+                                justifyContent: 'center'
+                            }}>
+                                {relatedItems.map((relatedItem, index) => (
+                                    <Grid item xs={12} sm={6} md={3} key={relatedItem._id}>
+                                        <Fade in={true} timeout={800 + index * 200}>
+                                            <Box>
+                                                <CardItem
+                                                    imagen={relatedItem.imageUrl}
+                                                    nombre={relatedItem.nombre}
+                                                    precio={relatedItem.precio}
+                                                    onClick={() => handleProductClick(relatedItem._id)}
+                                                />
+                                            </Box>
+                                        </Fade>
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        </Box>
+                    )}
                 </Box>
             </Fade>
         </Box>

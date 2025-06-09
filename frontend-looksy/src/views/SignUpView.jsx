@@ -196,16 +196,6 @@ function SignUpView() {
                         <br />
                         Identificate!
                     </Button>
-                    <Button
-                        sx={{
-                            color: '#673430',
-                            textTransform: 'none',
-                            fontSize: '0.9rem'
-                        }}
-
-                    >
-                        ¿Olvidaste tu contraseña?
-                    </Button>
                 </Box>
             </Box>
         </Box>

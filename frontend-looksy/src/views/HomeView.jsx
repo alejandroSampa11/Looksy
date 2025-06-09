@@ -26,7 +26,6 @@ export async function fetchProducts(filterStr, page, sortQ, minPrice, maxPrice) 
 function HomeView() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { userInfo, isAdmin } = useSelector(state => state.user);
   const { searchFilter, sort, minPrice, maxPrice } = useSelector(state => state.searchFilter);
   const { items: products, totalPages } = useSelector(state => state.products);
   const [isLoading, setIsLoading] = useState(true);

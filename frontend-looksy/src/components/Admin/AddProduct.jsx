@@ -114,7 +114,8 @@ function AddProduct(props) {
             'Pulseras': '⚡',
             'Bracelet': '⚡',
             'Rings': '💍',
-            'Accessories': '👜'
+            'Accessories': '👜',
+            'Watches':'⌚️'
         };
         return icons[categoryName] || '📦';
     };

@@ -77,8 +77,6 @@ const NestedCategoryItem = ({ category, handleNavigation, level = 0 }) => {
 
 const CategoryList = ({ categories, handleNavigation }) => {
 
-
-
   return (
     <List sx={{}}>
 

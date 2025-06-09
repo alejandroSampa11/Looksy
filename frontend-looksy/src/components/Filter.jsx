@@ -11,8 +11,8 @@ function Filter() {
     const { minPrice, maxPrice, sort } = useSelector(state => state.searchFilter);
 
     // Estado local para los inputs
-    const [localMin, setLocalMin] = useState(minPrice ?? PRICE_MIN);
-    const [localMax, setLocalMax] = useState(maxPrice ?? PRICE_MAX);
+    const [localMin, setLocalMin] = useState(minPrice);
+    const [localMax, setLocalMax] = useState(maxPrice);
 
     const handleSortChange = (event) => {
         dispatch(setSort(event.target.value));

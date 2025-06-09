@@ -1,7 +1,6 @@
 # Etapa de construcción (build)
 FROM node:22-alpine AS builder
 ENV NODE_ENV=production
-ENV VITE
 WORKDIR /app
 COPY . .
 RUN npm config set "strict-ssl" false

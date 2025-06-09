@@ -1,0 +1,14 @@
+[Unit]
+Description=Looksy Full Stack Application
+After=network.target mongod.service
+Wants=mongod.service looksy-backend.service looksy-frontend.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/true
+ExecReload=/bin/systemctl reload looksy-backend.service looksy-frontend.service
+
+[Install]
+WantedBy=multi-user.target
+Also=looksy-backend.service looksy-frontend.service

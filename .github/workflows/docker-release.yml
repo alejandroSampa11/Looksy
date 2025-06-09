@@ -1,0 +1,36 @@
+name: Build and Deploy Docker Compose
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Clean out old containers and images
+        run: |
+          docker-compose down --remove-orphans || true
+          docker image rm front:fs1 back:fs1 || true
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker images
+        run: |
+          docker-compose build
+
+      - name: Deploy containers
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          VITE_BACKEND_API: ${{ secrets.VITE_BACKEND_API }}
+          VITE_IMAGEN: ${{ secrets.VITE_IMAGEN }}
+          PORT: ${{ secrets.PORT }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: |
+          docker-compose up -d

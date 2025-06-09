@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   back:
     build:
@@ -8,8 +6,7 @@ services:
     image: back:fs1
     container_name: back_fs1
     ports:
-      - "3000:3000"
-    environment:
+      - "3000:3000"    environment:
       - NODE_ENV=production
       - PORT=3000
       - MONGO_URI=${MONGO_URI}

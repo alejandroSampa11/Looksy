@@ -9,8 +9,8 @@ import EditIcon from '@mui/icons-material/Edit';
 
 function EditProduct(props) {
     const { selectedProduct, products, getStockColor, setSelectedProduct,
-        setFormData,resetForm, formData, getCategoryNumber,
-        fetchProducts, handleInputChange} = props;
+        setFormData, resetForm, formData, getCategoryNumber,
+        fetchProducts, handleInputChange } = props;
 
     const [categories, setCategories] = useState({});
 
@@ -47,14 +47,13 @@ function EditProduct(props) {
         fetchCategories();
     }, []);
 
-
     const handleUpdateProduct = async (e) => {
         e.preventDefault();
         try {
             const itemData = {
                 id: selectedProduct.id,
                 nombre: formData.name,
-                categoria: getCategoryNumber(formData.category),
+                categoria: formData.category,
                 precio: parseFloat(formData.price),
                 stock: parseInt(formData.stock),
                 descripcion: formData.description,
@@ -75,6 +74,17 @@ function EditProduct(props) {
         }
     };
 
+    const getCategoryIcon = (categoryName) => {
+        const icons = {
+            'Jewelry': '💎',
+            'Aretes': '💍',
+            'Necklaces': '📿',
+            'Pulseras': '⚡',
+            'Rings': '💍',
+            'Accessories': '👜'
+        };
+        return icons[categoryName] || '📦';
+    };
 
     return (
         <Card
@@ -83,8 +93,8 @@ function EditProduct(props) {
                 borderRadius: 3,
                 background: 'rgba(255,255,255,0.95)',
                 backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255,255,255,0.2)',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+                border: '1px solid rgba(103, 52, 48, 0.2)',
+                boxShadow: '0 8px 32px rgba(103, 52, 48, 0.15)'
             }}
         >
             <CardContent sx={{ p: 4 }}>
@@ -111,7 +121,7 @@ function EditProduct(props) {
                             </Box>
                         </Stack>
 
-                        <Divider sx={{ mb: 4, background: 'linear-gradient(90deg, transparent, #667eea, transparent)' }} />
+                        <Divider sx={{ mb: 4, background: 'linear-gradient(90deg, transparent, #673430, transparent)' }} />
 
                         <TableContainer sx={{ borderRadius: 2, overflow: 'hidden' }}>
                             <Table>
@@ -190,11 +200,11 @@ function EditProduct(props) {
                                                 <IconButton
                                                     onClick={() => handleSelectProductToEdit(product)}
                                                     sx={{
-                                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                                        background: 'linear-gradient(135deg, #673430 0%, #8B4513 100%)',
                                                         color: 'white',
                                                         '&:hover': {
                                                             transform: 'scale(1.1)',
-                                                            boxShadow: '0 4px 20px rgba(102, 126, 234, 0.4)'
+                                                            boxShadow: '0 4px 20px rgba(103, 52, 48, 0.4)'
                                                         },
                                                         transition: 'all 0.3s ease'
                                                     }}
@@ -210,54 +220,34 @@ function EditProduct(props) {
                     </>
                 ) : (
                     <>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                            <Stack direction="row" alignItems="center" spacing={2}>
-                                <Avatar
-                                    src={selectedProduct.imageUrl}
-                                    variant="rounded"
-                                    sx={{
-                                        width: 60,
-                                        height: 60,
-                                        border: '3px solid white',
-                                        boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
-                                    }}
-                                />
-                                <Box>
-                                    <Typography variant="h5" sx={{ fontWeight: 700, color: '#2d3748' }}>
-                                        Editing: {selectedProduct.name}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Update product information
-                                    </Typography>
-                                </Box>
-                            </Stack>
-                            <Button
-                                variant="outlined"
-                                onClick={() => {
-                                    setSelectedProduct(null);
-                                    resetForm();
-                                }}
-                                sx={{
-                                    borderRadius: 2,
-                                    borderColor: '#667eea',
-                                    color: '#667eea',
-                                    '&:hover': {
-                                        backgroundColor: alpha('#667eea', 0.1),
-                                        transform: 'translateY(-2px)'
-                                    }
-                                }}
-                            >
-                                Back to List
-                            </Button>
-                        </Box>
+                        <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
+                            <Box sx={{
+                                p: 2,
+                                borderRadius: 2,
+                                background: 'linear-gradient(135deg, #673430 0%, #8B4513 100%)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}>
+                                <EditIcon sx={{ color: 'white', fontSize: 28 }} />
+                            </Box>
+                            <Box>
+                                <Typography variant="h5" sx={{ fontWeight: 700, color: '#673430' }}>
+                                    Edit Product
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    Update product information for {selectedProduct.name}
+                                </Typography>
+                            </Box>
+                        </Stack>
 
-                        <Divider sx={{ mb: 4, background: 'linear-gradient(90deg, transparent, #667eea, transparent)' }} />
+                        <Divider sx={{ mb: 4, background: 'linear-gradient(90deg, transparent, #673430, transparent)' }} />
 
                         <form onSubmit={handleUpdateProduct}>
                             <Grid container spacing={3}>
-                                <Grid item xs={12} md={6}>
+                                <FormControl fullWidth>
                                     <TextField
-                                        fullWidth
+                                        width={'80%'}
                                         label="Product Name"
                                         name="name"
                                         value={formData.name}
@@ -267,137 +257,195 @@ function EditProduct(props) {
                                         sx={{
                                             '& .MuiOutlinedInput-root': {
                                                 borderRadius: 2,
+                                                transition: 'all 0.3s ease',
                                                 '&:hover': {
-                                                    boxShadow: '0 4px 12px rgba(102, 126, 234, 0.15)'
+                                                    boxShadow: '0 4px 12px rgba(103, 52, 48, 0.15)'
+                                                },
+                                                '&.Mui-focused': {
+                                                    '& .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: '#673430'
+                                                    }
                                                 }
+                                            },
+                                            '& .MuiInputLabel-root.Mui-focused': {
+                                                color: '#673430'
                                             }
                                         }}
                                     />
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <FormControl fullWidth variant="outlined">
-                                        <InputLabel>Category</InputLabel>
-                                        <Select
-                                            name="category"
-                                            value={formData.category}
+                                </FormControl>
+
+                                {/* Category Select */}
+                                <FormControl fullWidth variant="outlined">
+                                    <InputLabel>Category</InputLabel>
+                                    <Select
+                                        name="category"
+                                        value={formData.category}
+                                        onChange={handleInputChange}
+                                        required
+                                        label="Category"
+                                        sx={{
+                                            borderRadius: 2,
+                                            '&:hover': {
+                                                boxShadow: '0 4px 12px rgba(103, 52, 48, 0.15)'
+                                            },
+                                            '&.Mui-focused': {
+                                                '& .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#673430'
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        {Object.entries(categories).map(([categoryId, categoryName]) => (
+                                            <MenuItem key={categoryId} value={categoryId}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                    {categoryName}
+                                                </Box>
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+
+                                <FormControl fullWidth>
+                                    <Box display={'flex'} flexDirection={'row'} gap={4}>
+                                        <TextField
+                                            fullWidth
+                                            label="Price"
+                                            name="price"
+                                            type="number"
+                                            value={formData.price}
                                             onChange={handleInputChange}
                                             required
-                                            label="Category"
+                                            InputProps={{
+                                                startAdornment: '$',
+                                                inputProps: { min: 0, step: 0.01 }
+                                            }}
+                                            variant="outlined"
                                             sx={{
-                                                borderRadius: 2,
-                                                '&:hover': {
-                                                    boxShadow: '0 4px 12px rgba(102, 126, 234, 0.15)'
+                                                '& .MuiOutlinedInput-root': {
+                                                    borderRadius: 2,
+                                                    '&:hover': {
+                                                        boxShadow: '0 4px 12px rgba(103, 52, 48, 0.15)'
+                                                    },
+                                                    '&.Mui-focused': {
+                                                        '& .MuiOutlinedInput-notchedOutline': {
+                                                            borderColor: '#673430'
+                                                        }
+                                                    }
+                                                },
+                                                '& .MuiInputLabel-root.Mui-focused': {
+                                                    color: '#673430'
                                                 }
                                             }}
-                                        >
-                                            {Object.entries(categories).map(([categoryId, categoryName]) => (
-                                                <MenuItem key={categoryId} value={categoryId}>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                        {categoryName}
-                                                    </Box>
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <TextField
-                                        fullWidth
-                                        label="Price"
-                                        name="price"
-                                        type="number"
-                                        value={formData.price}
-                                        onChange={handleInputChange}
-                                        required
-                                        InputProps={{
-                                            startAdornment: '$',
-                                            inputProps: { min: 0, step: 0.01 }
-                                        }}
-                                        variant="outlined"
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                borderRadius: 2,
-                                                '&:hover': {
-                                                    boxShadow: '0 4px 12px rgba(102, 126, 234, 0.15)'
+                                        />
+                                        <TextField
+                                            fullWidth
+                                            label="Stock Quantity"
+                                            name="stock"
+                                            type="number"
+                                            value={formData.stock}
+                                            onChange={handleInputChange}
+                                            required
+                                            InputProps={{ inputProps: { min: 0 } }}
+                                            variant="outlined"
+                                            sx={{
+                                                '& .MuiOutlinedInput-root': {
+                                                    borderRadius: 2,
+                                                    '&:hover': {
+                                                        boxShadow: '0 4px 12px rgba(103, 52, 48, 0.15)'
+                                                    },
+                                                    '&.Mui-focused': {
+                                                        '& .MuiOutlinedInput-notchedOutline': {
+                                                            borderColor: '#673430'
+                                                        }
+                                                    }
+                                                },
+                                                '& .MuiInputLabel-root.Mui-focused': {
+                                                    color: '#673430'
+                                                }
+                                            }}
+                                        />
+                                    </Box>
+                                </FormControl>
+
+                                <TextField
+                                    fullWidth
+                                    label="Product Description"
+                                    name="description"
+                                    multiline
+                                    rows={4}
+                                    value={formData.description}
+                                    onChange={handleInputChange}
+                                    variant="outlined"
+                                    sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: 2,
+                                            '&:hover': {
+                                                boxShadow: '0 4px 12px rgba(103, 52, 48, 0.15)'
+                                            },
+                                            '&.Mui-focused': {
+                                                '& .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#673430'
                                                 }
                                             }
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} md={6}>
+                                        },
+                                        '& .MuiInputLabel-root.Mui-focused': {
+                                            color: '#673430'
+                                        }
+                                    }}
+                                />
+
+                                <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start', width: '100%' }}>
+                                    {/* Image URL Input */}
                                     <TextField
-                                        fullWidth
-                                        label="Stock Quantity"
-                                        name="stock"
-                                        type="number"
-                                        value={formData.stock}
-                                        onChange={handleInputChange}
-                                        required
-                                        InputProps={{ inputProps: { min: 0 } }}
-                                        variant="outlined"
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                borderRadius: 2,
-                                                '&:hover': {
-                                                    boxShadow: '0 4px 12px rgba(102, 126, 234, 0.15)'
-                                                }
-                                            }
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth
-                                        label="Product Description"
-                                        name="description"
-                                        multiline
-                                        rows={4}
-                                        value={formData.description}
-                                        onChange={handleInputChange}
-                                        variant="outlined"
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                borderRadius: 2,
-                                                '&:hover': {
-                                                    boxShadow: '0 4px 12px rgba(102, 126, 234, 0.15)'
-                                                }
-                                            }
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
+                                        disabled
                                         fullWidth
                                         label="Image URL"
                                         name="imageUrl"
                                         value={formData.imageUrl}
-                                        onChange={handleInputChange}
                                         variant="outlined"
                                         sx={{
+                                            flex: 1,
                                             '& .MuiOutlinedInput-root': {
                                                 borderRadius: 2,
                                                 '&:hover': {
-                                                    boxShadow: '0 4px 12px rgba(102, 126, 234, 0.15)'
+                                                    boxShadow: '0 4px 12px rgba(103, 52, 48, 0.15)'
+                                                },
+                                                '&.Mui-focused': {
+                                                    '& .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: '#673430'
+                                                    }
                                                 }
+                                            },
+                                            '& .MuiInputLabel-root.Mui-focused': {
+                                                color: '#673430'
                                             }
                                         }}
                                     />
+
+
+                                    {/* Image Preview */}
                                     {formData.imageUrl && (
-                                        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
-                                            <Avatar
-                                                src={formData.imageUrl}
-                                                variant="rounded"
-                                                sx={{
-                                                    width: 160,
-                                                    height: 160,
-                                                    boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-                                                    border: '4px solid white'
-                                                }}
-                                            />
-                                        </Box>
+                                        <Avatar
+                                            src={`http://localhost:3000${formData.imageUrl}`}
+                                            variant="rounded"
+                                            sx={{
+                                                width: 80,
+                                                height: 80,
+                                                boxShadow: '0 4px 16px rgba(103, 52, 48, 0.25)',
+                                                border: '2px solid white'
+                                            }}
+                                        />
                                     )}
-                                </Grid>
-                                <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                                </Box>
+
+                                <Box sx={{
+                                    display: 'flex',
+                                    width: '100%',
+                                    gap: 3,
+                                    alignItems: 'center',
+                                    justifyContent: 'flex-end',
+                                    borderTop: '1px solid rgba(103, 52, 48, 0.1)'
+                                }}>
                                     <Button
                                         variant="outlined"
                                         onClick={() => {
@@ -405,37 +453,72 @@ function EditProduct(props) {
                                             resetForm();
                                         }}
                                         sx={{
-                                            borderRadius: 2,
-                                            borderColor: '#667eea',
-                                            color: '#667eea',
+                                            borderRadius: 3,
+                                            color: '#673430',
+                                            borderColor: '#673430',
+                                            px: 4,
+                                            py: 1.5,
+                                            fontSize: '1rem',
+                                            fontWeight: 600,
+                                            minWidth: '120px',
+                                            border: '2px solid #673430',
                                             '&:hover': {
-                                                backgroundColor: alpha('#667eea', 0.1),
-                                                transform: 'translateY(-2px)'
-                                            }
+                                                backgroundColor: 'rgba(103, 52, 48, 0.08)',
+                                                borderColor: '#8B4513',
+                                                color: '#8B4513',
+                                                transform: 'translateY(-2px)',
+                                                boxShadow: '0 6px 20px rgba(103, 52, 48, 0.2)'
+                                            },
+                                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                                         }}
                                     >
                                         Cancel
                                     </Button>
+
                                     <Button
                                         type="submit"
                                         variant="contained"
                                         size="large"
                                         sx={{
-                                            px: 4,
-                                            py: 1.5,
-                                            borderRadius: 2,
-                                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                            boxShadow: '0 4px 20px rgba(102, 126, 234, 0.4)',
-                                            '&:hover': {
-                                                transform: 'translateY(-2px)',
-                                                boxShadow: '0 8px 25px rgba(102, 126, 234, 0.6)'
+                                            px: 6,
+                                            py: 2,
+                                            borderRadius: 3,
+                                            fontSize: '1.1rem',
+                                            fontWeight: 700,
+                                            minWidth: '160px',
+                                            background: 'linear-gradient(135deg, #673430 0%, #8B4513 50%, #A0522D 100%)',
+                                            boxShadow: '0 8px 25px rgba(103, 52, 48, 0.4)',
+                                            border: 'none',
+                                            position: 'relative',
+                                            overflow: 'hidden',
+                                            '&::before': {
+                                                content: '""',
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: '-100%',
+                                                width: '100%',
+                                                height: '100%',
+                                                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                                                transition: 'left 0.5s'
                                             },
-                                            transition: 'all 0.3s ease'
+                                            '&:hover': {
+                                                transform: 'translateY(-3px)',
+                                                boxShadow: '0 12px 35px rgba(103, 52, 48, 0.6)',
+                                                background: 'linear-gradient(135deg, #5a2b28 0%, #7a3e11 50%, #8B4513 100%)',
+                                                '&::before': {
+                                                    left: '100%'
+                                                }
+                                            },
+                                            '&:active': {
+                                                transform: 'translateY(-1px)',
+                                                boxShadow: '0 8px 25px rgba(103, 52, 48, 0.5)'
+                                            },
+                                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                                         }}
                                     >
-                                        Save Changes
+                                        💾 Save Changes
                                     </Button>
-                                </Grid>
+                                </Box>
                             </Grid>
                         </form>
                     </>
@@ -444,6 +527,5 @@ function EditProduct(props) {
         </Card>
     )
 }
-
 
 export default EditProduct

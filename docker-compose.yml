@@ -6,7 +6,7 @@ services:
     image: back:fs1
     container_name: back_fs1
     ports:
-      - "3000:3000"    
+      - "3000:3000"
     environment:
       - NODE_ENV=production
       - PORT=3000

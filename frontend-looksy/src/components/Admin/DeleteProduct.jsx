@@ -120,7 +120,7 @@ function DeleteProduct(props) {
                                 }}>
                                     <TableCell>
                                         <Avatar
-                                            src={product.imageUrl ? `http://localhost:3000${product.imageUrl}` : '/default-placeholder.jpg'}
+                                            src={product.imageUrl ? `${import.meta.env.VITE_IMAGEN}${product.imageUrl}` : '/default-placeholder.jpg'}
                                             variant="rounded"
                                             sx={{
                                                 width: 60,

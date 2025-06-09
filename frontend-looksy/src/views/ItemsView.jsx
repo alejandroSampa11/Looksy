@@ -169,7 +169,7 @@ function ItemDetailView() {
                             }
                         }}
                     >
-                        Volver
+                        Return
                     </Button>
 
                     {/* Item Detail Card */}
@@ -203,7 +203,7 @@ function ItemDetailView() {
                                 <Zoom in={imageLoaded} timeout={600}>
                                     <Box
                                         component="img"
-                                        src={item.imageUrl ? `http://localhost:3000${item.imageUrl}` : '/placeholder-image.jpg'}
+                                        src={item.imageUrl ? `${import.meta.env.VITE_IMAGEN}${item.imageUrl}` : '/placeholder-image.jpg'}
                                         alt={item.nombre}
                                         onLoad={() => setImageLoaded(true)}
                                         sx={{

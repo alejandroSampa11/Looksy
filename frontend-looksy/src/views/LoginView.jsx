@@ -118,15 +118,6 @@ function LoginView() {
                             textTransform: 'none',
                             fontSize: '0.9rem'
                         }}
-                    >
-                        ¿Olvidaste tu contraseña?
-                    </Button>
-                    <Button
-                        sx={{
-                            color: '#673430',
-                            textTransform: 'none',
-                            fontSize: '0.9rem'
-                        }}
                         onClick={() => navigate('/sign-up')}
 
                     >

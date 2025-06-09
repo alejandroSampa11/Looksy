@@ -37,7 +37,7 @@ function AdminView() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [formData, setFormData] = useState({ name: '', category: 'rings', price: '', stock: '', description: '', imageUrl: '' });
 
-  const { userInfo, isAdmin } = useSelector(state => state.user);
+  const { isAdmin } = useSelector(state => state.user);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -76,16 +76,6 @@ function AdminView() {
     }
   }
 
-  const getCategoryName = (categoryNumber) => {
-    const categoryMap = {
-      1: 'rings',
-      2: 'necklaces',
-      3: 'earrings',
-      4: 'bracelets',
-      5: 'watches'
-    };
-    return categoryMap[categoryNumber] || 'rings';
-  };
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -123,20 +113,6 @@ function AdminView() {
     return categoryMap[categoryName] || 1;
   };
 
-
-  const totalProducts = products.length;
-  const totalStock = products.reduce((sum, product) => sum + product.stock, 0);
-  const totalValue = products.reduce((sum, product) => sum + (product.price * product.stock), 0);
-  const totalSales = products.reduce((sum, product) => sum + product.sales, 0);
-
-  const categories = [...new Set(products.map(product => product.category))];
-  const bestSellingProduct = products.length > 0
-    ? products.reduce((prev, current) => (prev.sales > current.sales) ? prev : current)
-    : { name: 'No products', imageUrl: '', sales: 0 };
-
-  const highestRatedProduct = products.length > 0
-    ? products.reduce((prev, current) => (prev.rating > current.rating) ? prev : current)
-    : { name: 'No products', imageUrl: '', rating: 0 };
 
   const getStockColor = (stock) => {
     if (stock < 5) return 'error';

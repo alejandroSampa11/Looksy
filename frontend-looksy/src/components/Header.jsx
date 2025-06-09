@@ -35,12 +35,11 @@ import {
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setSearchFilter } from '../redux/slices/filterSlice'
 
 function Header({ onMenuClick, cartItemCount = 0 }) {
     const dispatch = useDispatch();
-     const { userInfo, isAdmin } = useSelector(state => state.user);
     const theme = useTheme()
     const isMobile = useMediaQuery(theme.breakpoints.down('md'))
     const { user, isAuthenticated } = useAuth();
@@ -90,24 +89,6 @@ function Header({ onMenuClick, cartItemCount = 0 }) {
             </Box>
             <Divider />
             <List>
-                <ListItem button>
-                    <ListItemIcon>
-                        <PersonIcon sx={{ color: '#673430' }} />
-                    </ListItemIcon>
-                    <ListItemText primary="Profile" />
-                </ListItem>
-                <ListItem button>
-                    <ListItemIcon>
-                        <FavoriteIcon sx={{ color: '#673430' }} />
-                    </ListItemIcon>
-                    <ListItemText primary="Wishlist" />
-                </ListItem>
-                <ListItem button>
-                    <ListItemIcon>
-                        <SettingsIcon sx={{ color: '#673430' }} />
-                    </ListItemIcon>
-                    <ListItemText primary="Settings" />
-                </ListItem>
                 <Divider />
                 <ListItem button onClick={() => { }}>
                     <ListItemIcon>
@@ -245,18 +226,6 @@ function Header({ onMenuClick, cartItemCount = 0 }) {
                     </Box>
 
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <IconButton
-                            sx={{
-                                color: '#673430',
-                                transition: 'all 0.2s ease-in-out',
-                                '&:hover': {
-                                    backgroundColor: 'rgba(103, 52, 48, 0.1)',
-                                    transform: 'scale(1.1)'
-                                }
-                            }}
-                        >
-                            <NotificationsIcon sx={{ fontSize: 26 }} />
-                        </IconButton>
 
                         <IconButton
                             onClick={handleProfileMenuOpen}
@@ -296,18 +265,6 @@ function Header({ onMenuClick, cartItemCount = 0 }) {
             >
                 {isAuthenticated ?
                     <>
-                        <MenuItem onClick={handleProfileMenuClose}>
-                            <PersonIcon sx={{ mr: 2, color: '#673430' }} />
-                            Profile
-                        </MenuItem>
-                        <MenuItem onClick={handleProfileMenuClose}>
-                            <FavoriteIcon sx={{ mr: 2, color: '#673430' }} />
-                            Wishlist
-                        </MenuItem>
-                        <MenuItem onClick={handleProfileMenuClose}>
-                            <SettingsIcon sx={{ mr: 2, color: '#673430' }} />
-                            Settings
-                        </MenuItem>
                         <MenuItem onClick={handleLogout}>
                             <LogoutIcon sx={{ mr: 2, color: '#673430' }} />
                             Logout

@@ -29,12 +29,14 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import apiAxios from '../config/cienteAxios'
 import CategoryList from './CategoryList'
+import { useSelector } from 'react-redux';
 const drawerWidth = 320
 
 function DrawerSide({ onMenuClick, isDrawerOpen }) {
     const navigate = useNavigate()
     const { user, isAuthenticated, hasRole } = useAuth();
     const [categories, setCategories] = useState([])
+    const refresh = useSelector(state => state.category.refresh);
 
     const handleNavigation = (path) => {
         navigate(path)
@@ -52,7 +54,7 @@ function DrawerSide({ onMenuClick, isDrawerOpen }) {
             }
         }
         fetchCategories()
-    }, [])
+    }, [refresh])
 
     return (
         <Drawer

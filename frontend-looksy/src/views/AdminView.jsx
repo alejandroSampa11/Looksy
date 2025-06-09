@@ -18,6 +18,7 @@ import AddProduct from '../components/Admin/AddProduct';
 import EditProduct from '../components/Admin/EditProduct';
 import DeleteProduct from '../components/Admin/DeleteProduct';
 import Statitics from '../components/Admin/Statistics';
+import CategoryCreator from '../components/Admin/CategoryCreator';
 
 
 const categoryOptions = [
@@ -246,6 +247,7 @@ function AdminView() {
               <Tab label="Edit Product" icon={<EditIcon />} iconPosition="start" />
               <Tab label="Manage Inventory" icon={<DeleteIcon />} iconPosition="start" />
               <Tab label="Store Statistics" icon={<ShowChartIcon />} iconPosition="start" />
+              <Tab label="Category Creator" icon={<AddIcon />} iconPosition="start" />
             </Tabs>
           </Paper>
 
@@ -288,6 +290,10 @@ function AdminView() {
           {tabValue === 3 && (
             <Statitics
             />
+          )}
+
+          {tabValue === 4 && (
+            <CategoryCreator/>
           )}
         </Container>
       </Box >

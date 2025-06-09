@@ -1,30 +1,47 @@
-FROM node:18
+# Use Node.js 18 LTS
+FROM node:18-slim
+
+# Install necessary system dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create app directory
 WORKDIR /usr/src/app
 
-# Install app dependencies
+# Copy package files
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Install all dependencies (including dev dependencies for building)
-RUN npm ci --no-audit --no-fund
+# Install dependencies
+RUN npm install
 
-# Bundle app source
+# Copy source code
 COPY . .
 
-# Build the TypeScript code
+# Build TypeScript
 RUN npm run build
 
-# Remove dev dependencies to reduce image size
-RUN npm ci --only=production --no-audit --no-fund && npm cache clean --force
+# Remove dev dependencies
+RUN npm prune --production
 
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=3000
 
+# Create non-root user
+RUN groupadd -r nodeuser && useradd -r -g nodeuser nodeuser
+RUN chown -R nodeuser:nodeuser /usr/src/app
+USER nodeuser
+
 # Expose port
 EXPOSE 3000
 
-# Start command
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000/api/users/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" || exit 1
+
+# Start the application
 CMD ["node", "dist/app.js"]

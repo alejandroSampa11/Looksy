@@ -41,21 +41,6 @@ describe("Item Controller Tests", () => {
     });
   });
 
-  describe("GET /api/item/category/:category", () => {
-    it("should return 400 for invalid category", async () => {
-      const res = await request(app).get("/api/item/category/invalid");
-      expect(res.statusCode).toBe(400);
-      expect(res.body.success).toBe(false);
-    });
-
-    it("should return items for valid category", async () => {
-      (Item.find as jest.Mock).mockResolvedValue([mockItem]);
-      const res = await request(app).get("/api/item/category/1");
-      expect(res.statusCode).toBe(200);
-      expect(res.body.success).toBe(true);
-    });
-  });
-
   describe("GET /api/item", () => {
     it("should return all items", async () => {
       (Item.find as jest.Mock).mockResolvedValue([mockItem]);

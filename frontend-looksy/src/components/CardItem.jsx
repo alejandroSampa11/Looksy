@@ -1,10 +1,12 @@
 import { Box, Typography } from '@mui/material'
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import React from 'react'
+import { toast } from 'react-toastify';
 
 function CardItem({ imagen, nombre, precio, onClick}) {
     const handleCartClick = (e) => {
         e.stopPropagation();
+        toast.success(`🛒 Agregado al carrito`)
     };
 
     return (
@@ -35,7 +37,7 @@ function CardItem({ imagen, nombre, precio, onClick}) {
                         objectFit: 'contain',
                         padding: 2,
                     }}
-                    src={`http://localhost:3000${imagen}`}
+                    src={`${import.meta.env.VITE_IMAGEN}${imagen}`}
                     alt={nombre}
                 />
                 <Box sx={{ p: 2, width: '100%', display:'flex', justifyContent:'space-between' }}>

@@ -9,7 +9,7 @@ import EditIcon from '@mui/icons-material/Edit';
 
 function EditProduct(props) {
     const { selectedProduct, products, getStockColor, setSelectedProduct,
-        setFormData, resetForm, formData, getCategoryNumber,
+        setFormData, resetForm, formData,
         fetchProducts, handleInputChange } = props;
 
     const [categories, setCategories] = useState({});
@@ -74,17 +74,6 @@ function EditProduct(props) {
         }
     };
 
-    const getCategoryIcon = (categoryName) => {
-        const icons = {
-            'Jewelry': '💎',
-            'Aretes': '💍',
-            'Necklaces': '📿',
-            'Pulseras': '⚡',
-            'Rings': '💍',
-            'Accessories': '👜'
-        };
-        return icons[categoryName] || '📦';
-    };
 
     return (
         <Card
@@ -153,7 +142,7 @@ function EditProduct(props) {
                                         }}>
                                             <TableCell>
                                                 <Avatar
-                                                    src={product.imageUrl ? `http://localhost:3000${product.imageUrl}` : '/default-placeholder.jpg'}
+                                                    src={product.imageUrl ? `${import.meta.env.VITE_IMAGEN}${product.imageUrl}` : '/default-placeholder.jpg'}
                                                     variant="rounded"
                                                     sx={{
                                                         width: 60,
@@ -426,7 +415,7 @@ function EditProduct(props) {
                                     {/* Image Preview */}
                                     {formData.imageUrl && (
                                         <Avatar
-                                            src={`http://localhost:3000${formData.imageUrl}`}
+                                            src={`${import.meta.env.VITE_IMAGEN}${formData.imageUrl}`}
                                             variant="rounded"
                                             sx={{
                                                 width: 80,
